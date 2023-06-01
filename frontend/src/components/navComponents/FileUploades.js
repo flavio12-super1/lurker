@@ -50,13 +50,8 @@ const DropArea = () => {
     const imageUrl = event.dataTransfer.getData("text/html");
     const rex = /src="?([^"\s]+)"?\s*/;
     const url = rex.exec(imageUrl);
-    // console.log(url[1]);
     const cleanedUrl = url[1].replace(/&amp;/g, "&"); // Remove all occurrences of '&amp;'
     console.log(cleanedUrl);
-    // setFiles((prevFiles) => [
-    //   ...prevFiles,
-    //   [{ imageURL: cleanedUrl, imageType: "url" }],
-    // ]);
     setFiles((prevFiles) => [...prevFiles, cleanedUrl]);
   };
 

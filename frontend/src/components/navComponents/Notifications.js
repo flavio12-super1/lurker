@@ -63,10 +63,6 @@ function Notifications() {
   };
   return (
     <div id="messagesOuterDiv">
-      {/* <div id="messagesNav">
-        Search message, recently sent, recently viewed, still on read, recently
-        deleted, settings
-      </div> */}
       <div id="messagesNavContainer">
         <div id="searchMessages">
           <div id="messagesNavSearch">

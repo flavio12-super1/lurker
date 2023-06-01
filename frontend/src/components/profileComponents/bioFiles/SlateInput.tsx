@@ -43,8 +43,6 @@ function SlateInput(props: any) {
     return withHistory(withReact(createEditor()));
   }, []);
 
-  // const [isEmpty, setIsEmpty] = useState(true);
-
   function sendMessage() {
     let x = JSON.parse(JSON.stringify(editor));
 
