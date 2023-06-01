@@ -18,7 +18,7 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("email", user.email);
       localStorage.setItem("userID", user._id);
-      window.location.href = "http://localhost:8000/dashboard";
+      window.location.href = "http://localhost:8000/lurker";
     } catch (error) {
       if (error.response) {
         if (error.response.status === 401) {

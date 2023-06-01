@@ -1,23 +1,3 @@
-// const express = require("express");
-// const router = express.Router();
-// const mongoose = require("mongoose");
-// const userSchema = require("../models/userSchema");
-
-// mongoose.model("User", userSchema); // create the User model
-
-// router.get("/", async (req, res, next) => {
-//   try {
-//     // console.log(req.userId);
-//     const user = await mongoose.model("User").findOne({ _id: req.userId });
-//     console.log(user);
-//     res.send({ message: "hello world : )" });
-//   } catch (err) {
-//     next(err);
-//   }
-// });
-
-// module.exports = router;
-
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");

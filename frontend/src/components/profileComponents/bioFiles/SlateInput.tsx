@@ -110,7 +110,7 @@ function SlateInput(props: any) {
 
   return (
     <div id="outerTxtInput">
-      <Slate editor={editor} initialValue={initialValue}>
+      <Slate editor={editor} value={initialValue}>
         <Editable
           spellCheck
           placeholder="Dont be shy : )"

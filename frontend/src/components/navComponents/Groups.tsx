@@ -98,7 +98,7 @@ const Groups = () => {
   return (
     <Slate
       editor={editor}
-      initialValue={initialValue}
+      value={initialValue}
       onChange={() => {
         const { selection } = editor;
 

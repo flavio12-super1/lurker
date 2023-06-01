@@ -34,11 +34,6 @@ function Messages() {
   const [searchMessage, setSearchMessage] = useState("");
   const myRef = useRef(null);
 
-  // const [postMessageId, setPostMessageId] = useState({
-  //   username: "",
-  //   postMessageId: "",
-  // });
-
   useEffect(() => {
     setRoom({ room: channelID });
   }, [channelID]);
@@ -120,43 +115,6 @@ function Messages() {
     });
   }, []);
 
-  // useEffect(() => {
-  //   myRef.current?.scrollIntoView({
-  //     behavior: "smooth",
-  //     block: "end",
-  //   });
-  //   console.log("chat was updated");
-  // }, [chat]);
-
-  // const chatContainerRef = useRef(null);
-  // const chatMessagesRef = useRef(null);
-
-  // useEffect(() => {
-  //   const chatContainer = chatContainerRef.current;
-
-  //   const handleScroll = () => {
-  //     const { scrollTop, clientHeight, scrollHeight } = chatContainer;
-  //     const isAtBottom = scrollTop + clientHeight >= scrollHeight;
-  //     if (isAtBottom) {
-  //       chatContainer.style.scrollBehavior = "smooth";
-  //     } else {
-  //       chatContainer.style.scrollBehavior = "auto";
-  //     }
-  //   };
-
-  //   chatContainer.addEventListener("scroll", handleScroll);
-
-  //   return () => {
-  //     chatContainer.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   chatContainerRef.current.scrollTo({
-  //     top: chatMessagesRef.current.clientHeight,
-  //   });
-  // }, [chat]);
-
   const chatContainerRef = useRef(null);
   const [userScrolledToBottom, setUserScrolledToBottom] = useState(1);
 
@@ -166,7 +124,6 @@ function Messages() {
     const handleScroll = (e) => {
       const { scrollTop, clientHeight, scrollHeight } = chatContainer;
       const isAtBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
-      // setUserScrolledToBottom(isAtBottom);
       if (isAtBottom) {
         console.log("user scrolled to bottom");
         setUserScrolledToBottom(1);
@@ -201,16 +158,6 @@ function Messages() {
         console.log("pain");
       }
     }
-    // const { scrollHeight, clientHeight } = chatContainer;
-
-    // if (userScrolledToBottom == 1) {
-    //   chatContainer.scrollTo({
-    //     top: scrollHeight - clientHeight,
-    //     behavior: "smooth",
-    //   });
-    // } else {
-    //   console.log("pain");
-    // }
   }, [chat]);
 
   const handleScrollToBottom = () => {
@@ -221,58 +168,12 @@ function Messages() {
     });
   };
 
-  const [shift, setShift] = useState(0);
-
   const handleKeyPress = (event) => {
-    // const chatContainer = chatContainerRef.current;
-    // const { scrollHeight, clientHeight } = chatContainer;
-    // setShift(event.shiftKey);
-
-    // if (event.shiftKey && event.which === 13) {
-
-    // if (userScrolledToBottom == 1) {
-    //   handleScrollToBottom();
-    // } else {
-    //   console.log("pain");
-    // }
-    // if (userScrolledToBottom == 1) {
-    // chatContainer.scrollTo({
-    //   top: scrollHeight - clientHeight + 50,
-    //   behavior: "smooth",
-    // });
-    // myRef.current?.scrollIntoView({
-    //   behavior: "smooth",
-    //   block: "end",
-    // });
-    // if (myRef.current) {
-    //   console.log(".....scrolling.....to.......bottom");
-    //   myRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-    // }
     const chatContainer = chatContainerRef.current;
     const { scrollHeight, clientHeight } = chatContainer;
-    // console.log(
-    //   "scrollHeight: " +
-    //     scrollHeight +
-    //     " - " +
-    //     "clientHeight: " +
-    //     clientHeight +
-    //     " = " +
-    //     scrollHeight -
-    //     clientHeight
-    // );
     console.log(scrollHeight);
     console.log(clientHeight);
-
-    // chatContainer.scrollTo({
-    //   top: scrollHeight + 1000,
-    // });
-
-    // }
-    console.log("shift enter pressed");
-
-    // }
-
-    // console.log("shift enter pressed");
+    console.log("key enter pressed");
   };
 
   useEffect(() => {
@@ -308,17 +209,9 @@ function Messages() {
       };
       socket.emit("message", data);
     }
-    // console.log(messages);
-    // const data = {
-    //   message: messages,
-    //   channelID: channelID,
-    // };
-    // socket.emit("message", data);
   };
 
   const handleNavigate = (channelID) => {
-    // socket.emit("leaveRoom", room.room);
-    // navigate("/lurker/channel/messages/" + channelID);
     socket.emit("leaveRoom", room.room, () => {
       // Callback function called when the "leaveRoom" event is acknowledged
       setChat([]);
@@ -341,8 +234,6 @@ function Messages() {
 
   //handle image uploads
   const [files, setFiles] = useState([]);
-  // const [hasFile, setHasFile] = useState(false);
-
   const handlePaste = (event) => {
     const clipboardItems = Array.from(event.clipboardData.items);
 
@@ -389,13 +280,8 @@ function Messages() {
     const imageUrl = event.dataTransfer.getData("text/html");
     const rex = /src="?([^"\s]+)"?\s*/;
     const url = rex.exec(imageUrl);
-    // console.log(url[1]);
     const cleanedUrl = url[1].replace(/&amp;/g, "&"); // Remove all occurrences of '&amp;'
     console.log(cleanedUrl);
-    // setFiles((prevFiles) => [
-    //   ...prevFiles,
-    //   [{ imageURL: cleanedUrl, imageType: "url" }],
-    // ]);
     setFiles((prevFiles) => [...prevFiles, cleanedUrl]);
   };
 
@@ -487,50 +373,6 @@ function Messages() {
     setFiles((prevFiles) => [...prevFiles, ...compressedFiles]);
   };
 
-  //scroll behavior for messages
-  // const chatContainerRef = useRef(null);
-  // const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
-
-  // // Function to handle new messages
-  // const handleNewMessage = () => {
-  //   // Your logic to add the new message
-
-  //   // Check if user is already at the bottom
-  //   const { scrollTop, clientHeight, scrollHeight } = chatContainerRef.current;
-  //   const isAtBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
-
-  //   // Set shouldScrollToBottom based on user's scroll position
-  //   setShouldScrollToBottom(isAtBottom);
-  // };
-
-  // // Scroll to the bottom of the chat container on initial load
-  // useEffect(() => {
-  //   chatContainerRef.current.scrollIntoView({ behavior: "auto" });
-  // }, []);
-
-  // // Add scroll event listener to track user's scroll position
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     const { scrollTop, clientHeight, scrollHeight } =
-  //       chatContainerRef.current;
-  //     const isAtBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
-  //     setShouldScrollToBottom(isAtBottom);
-  //   };
-
-  //   chatContainerRef.current.addEventListener("scroll", handleScroll);
-
-  //   return () => {
-  //     chatContainerRef.current.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, []);
-
-  // // Scroll to the bottom if user is already at the bottom and shouldScrollToBottom is true
-  // useEffect(() => {
-  //   if (shouldScrollToBottom) {
-  //     chatContainerRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [shouldScrollToBottom]);
-
   return (
     <div
       id="messagesOuterDiv"
@@ -539,10 +381,6 @@ function Messages() {
       onDragOver={handleDragOver}
       onKeyDown={(event) => handleKeyPress(event)}
     >
-      {/* <div id="messagesNav">
-        Search message, recently sent, recently viewed, still on read, recently
-        deleted, settings
-      </div> */}
       <div id="messagesNavContainer">
         <div id="searchMessages">
           <div className="messagesNavElements">
@@ -612,25 +450,14 @@ function Messages() {
 
           {channelID != null ? (
             <div id="chatDiv">
-              {/* <div id="chatMessagesDiv" ref={chatContainerRef}>
-                <div ref={chatMessagesRef}>
-                  <div>
-                    <h1>This is the start of a new Converstaion</h1>
-                  </div>
-                  {renderChat().reverse()}
-                </div>
-              </div> */}
               <div id="chatMessagesDiv" ref={chatContainerRef}>
                 <div style={{ overflowAnchor: "none" }}>
-                  {/* <div id="innerChatMessagesDiv"> */}
                   <div>
                     {renderChat().reverse()}
                     <div ref={myRef}></div>
                   </div>
                 </div>
               </div>
-              {/* <div ref={chatContainerRef} /> */}
-              {/* here */}
               <div id="outerSlateDiv">
                 <div style={{ flexGrow: "1" }}>
                   <div id="imageContainer">
@@ -688,11 +515,6 @@ function Messages() {
                         }}
                       >
                         <SlateInput onMessageSubmit={onMessageSubmit} />
-                        {/* <SlateInput
-                          onMessageSubmit={() =>
-                            handleFileUpload(onMessageSubmit)
-                          }
-                        /> */}
                       </EventContext.Provider>
                     </div>
                     <div id="imgButtonDiv">
@@ -708,9 +530,6 @@ function Messages() {
                           <i className="material-icons">add_photo_alternate</i>
                         </label>
                       </div>
-                      {/* <div>
-                      <button onClick={handleFileUpload}>upload</button>
-                    </div> */}
                     </div>
                   </div>
                 </div>
@@ -723,15 +542,6 @@ function Messages() {
               <FileUploades />
             </div>
           )}
-          {/* <div>my messages!!</div>
-          {renderChat().reverse()}
-          <EventContext.Provider
-            value={{
-              postMessageId,
-            }}
-          >
-            <SlateInput onMessageSubmit={onMessageSubmit} />
-          </EventContext.Provider> */}
         </div>
       </div>
     </div>

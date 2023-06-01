@@ -726,10 +726,6 @@ app.get("/register", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
 });
 
-app.get("/dashboard", verify, (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
-});
-
 app.get("/Lurker", verify, (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
 });
@@ -761,14 +757,6 @@ app.set("io", io);
 const testRoutes = require("./routes/test");
 app.use("/test", verifyJWT, testRoutes);
 // Routes
-const chartRoutes = require("./routes/chart");
-app.use("/chart", verifyJWT, chartRoutes);
-// Routes
-const uploadRoutes = require("./routes/upload-xlsx");
-app.use("/upload", verifyJWT, uploadRoutes);
-// Routes
-const deleteRoute = require("./routes/deleteRoute");
-app.use("/delete", verifyJWT, deleteRoute);
 const userData = require("./routes/userData");
 app.use("/userData", verifyJWT, userData);
 const saveEdites = require("./routes/saveEdites");
@@ -785,40 +773,6 @@ app.post("/getMessages", async (req, res) => {
   console.log(roomID);
   res.json("messages");
 });
-
-// //saving user profile themes
-// app.post("/saveEdits", verifyJWT, async (req, res) => {
-//   const { selectedTheme, selectedImage } = req.body; // Assuming the selected theme is sent from the frontend
-//   console.log(selectedTheme);
-//   console.log(selectedTheme.bc);
-
-//   // Update the profileTheme array in the session
-//   req.session.profileTheme = req.session.profileTheme || []; // Initialize the array if it doesn't exist
-//   req.session.profileTheme.push(selectedTheme);
-//   const userId = req.userId; // Assuming you have the user's ID in the session
-//   try {
-//     // Update the user's document in the database with the selected theme
-
-//     console.log(userId);
-
-//     const user = await User.findOne({ _id: userId });
-//     if (!user) {
-//       return res.status(404).send("User not found");
-//     }
-
-//     // Update the theme field in the user's document
-//     user.theme = {};
-//     user.theme.bc = selectedTheme.bc;
-//     user.theme.imageURL = selectedImage;
-
-//     // Save the updated user document
-//     await user.save();
-//     res.json({ bc: selectedTheme });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send("Error saving user");
-//   }
-// });
 
 app.get(
   "/verify",
@@ -859,32 +813,6 @@ async function main() {
 }
 
 main().catch(console.error);
-
-// const redis = require("redis");
-// const client = redis.createClient();
-
-// client.on("error", function (error) {
-//   console.error(error);
-// });
-
-// client.set("key", "value", redis.print);
-// client.get("key", redis.print);
-// const redis = require("redis");
-// const client = redis.createClient();
-
-// client.on("error", (err) => {
-//   console.error(err);
-// });
-
-// client.set("myArr", JSON.stringify([1, 2, 3]), (err) => {
-//   if (err) throw err;
-//   console.log("Array set successfully!");
-// });
-
-// client.get("myArr", (err, reply) => {
-//   if (err) throw err;
-//   console.log("Retrieved array:", JSON.parse(reply));
-// });
 
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

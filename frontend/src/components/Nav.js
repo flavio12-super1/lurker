@@ -17,19 +17,6 @@ function Nav() {
   const { friendRequests, myEmail } = userData;
   const [collaps, setCollaps] = useState(false);
 
-  //   useEffect(() => {
-  //     function handleClickOutside(event) {
-  //       if (event.target.closest(".popup") === null) {
-  //         setCollaps(false);
-  //       }
-  //     }
-
-  //     document.addEventListener("click", handleClickOutside);
-
-  //     return () => {
-  //       document.removeEventListener("click", handleClickOutside);
-  //     };
-  //   }, [collaps == true]);
   const handleLogout = async (event) => {
     event.preventDefault();
 

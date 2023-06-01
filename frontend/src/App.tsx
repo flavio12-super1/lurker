@@ -11,7 +11,6 @@ import Register from "./components/Register";
 import Home from "./components/Home";
 import Lurker from "./components/Lurker";
 import Chat from "./components/Chat";
-// import Notifications from "./components/Notifications";
 import Notifications from "./components/navComponents/Notifications";
 import Profile from "./components/Profile";
 import Explore from "./components/navComponents/Explore";
@@ -45,13 +44,6 @@ function App() {
       socket.off("disconnect");
     };
   }, []);
-
-  //   style={{
-  //   display: "flex",
-  //   justifyContent: "center",
-  //   backgroundColor: "#d4d2d0",
-  //   height: "100vh",
-  // }}
 
   return (
     <div className="appContainer">

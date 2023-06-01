@@ -26,12 +26,7 @@ function Lurker(props) {
     axiosInstance
       .get("http://localhost:8000/userData")
       .then((response) => {
-        // alert(response.data.message);
         console.log(response);
-        // setFriendRequest((notification) => [
-        //   response.data.notifications[0],
-        //   ...notification,
-        // ]);
         setFriendRequest((notification) => [
           ...response.data.notifications.map((user) => ({
             email: user.email,
@@ -53,12 +48,6 @@ function Lurker(props) {
       .catch((err) => {
         console.log(err);
       });
-    // const handleMessageReceived = (data) => {
-    //   alert(data.senderEmail + " says: " + data.message);
-    //   console.log(data);
-    //   setNotifications((notification) => [data, ...notification]);
-    //   SetCount((prevCount) => prevCount + 1);
-    // };
     const handleFriendReuest = (data) => {
       alert("Friend request from" + data.email);
       console.log(data);
@@ -66,7 +55,6 @@ function Lurker(props) {
       SetCount((prevCount) => prevCount + 1);
     };
     const handleFriendRequestAccepted = (data) => {
-      // alert("Friend request from" + data.myEmail);
       console.log(data);
       setFriendsList((friends) => [data, ...friends]);
       socket.emit("addChannel", data.channelID);
@@ -75,7 +63,6 @@ function Lurker(props) {
       navigate("/lurker/channel/messages/" + data.channelID);
     };
 
-    // socket.on("message", handleMessageReceived);
     socket.on("friendRequest", handleFriendReuest);
     socket.on("friendRequestAccepted", handleFriendRequestAccepted);
 
@@ -85,7 +72,6 @@ function Lurker(props) {
   }, [socket]);
 
   function denyRequest(id) {
-    // socket.emit("denyRequest", username, myEmail);
     let filteredArray = friendRequests.filter((item) => item.id !== id);
     setFriendRequest(filteredArray);
     const data = {
