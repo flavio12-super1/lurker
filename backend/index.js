@@ -110,29 +110,7 @@ const mdb = mongoose.connection;
 mdb.on("error", (error) => console.error(error));
 mdb.once("open", () => console.log("Connected to Mongoose"));
 
-// const userSchema = new mongoose.Schema(
-//   {
-//     email: { type: String, required: true },
-//     password: { type: String, required: true, select: true },
-//     notifications: { type: [mongoose.Schema.Types.ObjectId], ref: "User" },
-//   },
-//   { strict: true }
-// );
-
-// userSchema.methods.isValidPassword = async function (password) {
-//   try {
-//     const compare = await bcrypt.compare(password, this.password);
-//     return compare;
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error("Error comparing passwords");
-//   }
-// };
-
-// const User = mongoose.model("User", userSchema);
-const userSchema = require("./models/userSchema");
-
-const User = mongoose.model("User", userSchema);
+const { User } = require("./models/userSchema");
 
 //validate email:
 const validateEmail = (email) => {
@@ -746,6 +724,8 @@ const userData = require("./routes/userData");
 app.use("/userData", verifyJWT, userData);
 const saveEdites = require("./routes/saveEdites");
 app.use("/saveEdits", verifyJWT, saveEdites);
+const userPosts = require("./routes/userPosts");
+app.use("/userPosts", verifyJWT, userPosts);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -75,6 +75,15 @@ const themeSchema = new mongoose.Schema({
   },
 });
 
+const postSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  content: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  // Add other post fields as needed
+});
+
+const Post = mongoose.model("Post", postSchema);
+
 const userSchema = new mongoose.Schema(
   {
     email: { type: String, required: true },
@@ -104,6 +113,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
     theme: { type: themeSchema, required: true },
+    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }], // Reference the posts using their IDs
   },
   { strict: true }
 );
@@ -118,4 +128,5 @@ userSchema.methods.isValidPassword = async function (password) {
   }
 };
 
-module.exports = userSchema;
+const User = mongoose.model("User", userSchema); // Create the User model
+module.exports = { User, Post }; // Export the User model

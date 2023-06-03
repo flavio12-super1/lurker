@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const userSchema = require("../models/userSchema");
+// const userSchema = require("../models/userSchema");
 
-const User = mongoose.model("User", userSchema);
+// const User = mongoose.model("User", userSchema);
+const { User } = require("../models/userSchema");
 
 router.post("/", async (req, res, next) => {
   //saving user profile themes
