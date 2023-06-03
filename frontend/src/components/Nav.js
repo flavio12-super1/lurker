@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import axiosInstance from "../config/axiosConfig";
 import { Link } from "react-router-dom";
 import { UserContext } from "./Lurker";
-import spider from "./lurker-icons/spider.png";
+import spider from "./lurker-icons/spider2.png";
 import servers from "./lurker-icons/servers.png";
 import groups from "./lurker-icons/groups.png";
 import messages from "./lurker-icons/messages.png";

@@ -1,158 +1,114 @@
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-  createContext,
-} from "react";
-import "./UserBio.css";
-import "../../../styles/CommonStyles.css";
-import EmojiPicker from "./EmojiPicker";
-import SlateInput from "./SlateInput";
-import { Transforms, createEditor } from "slate";
-import { useSlate, withReact, Slate } from "slate-react";
-export const EventContext = createContext();
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import "./UserBiography.css";
 
-export const OverLay = ({ showPicker }) => {
-  const editor = useSlate();
-  const [showEmojiOverLay, setShowEmojiOverLay] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState(null);
-  const overLayRef = useRef(null);
-
-  const handleClickOutside = (e) => {
-    const clickedElement = e.target;
-    if (
-      overLayRef.current &&
-      !overLayRef.current.contains(e.target) &&
-      !clickedElement.closest("#outerTxtInput")
-    ) {
-      setShowEmojiOverLay(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  const handleEmojiOverLayClick = () => {
-    setShowEmojiOverLay(!showEmojiOverLay);
-  };
-
-  //send message
-  const onMessageSubmit = async (messages) => {
-    console.log(messages);
-  };
-
-  const onEmojiSelect = (emoji) => {
-    console.log("Emoji selected: ", emoji);
-    const text = { text: emoji };
-    Transforms.insertNodes(editor, text);
-    setSelectedEmoji(emoji);
-  };
-
-  return (
-    <div id="customOverLay">
-      <div id="customOverLayInner">
-        <div ref={overLayRef}>
-          <div id="customOverLayInnerButtons" onClick={handleEmojiOverLayClick}>
-            <div className="displayFlex smallIcon customIcon" id="done">
-              <div id="emoji"></div>
-            </div>
-            <div className="displayFlex smallIcon customIcon" id="close">
-              <span className="material-icons customIconStyle">close</span>
-            </div>
-          </div>
-          {showEmojiOverLay && (
-            <div className="custom-emoji-overlay">
-              <EmojiPicker onEmojiSelect={onEmojiSelect} />
-            </div>
-          )}
-        </div>
-      </div>
-      <div>
-        <EventContext.Provider
-          value={{ showEmojiOverLay, selectedEmoji, setSelectedEmoji }}
-        >
-          <SlateInput onMessageSubmit={onMessageSubmit} />
-        </EventContext.Provider>
-      </div>
-    </div>
-  );
-};
-
-const UserBio = ({ tempTheme, colorKey }) => {
-  const [showPicker, setShowPicker] = useState(false);
-  const [bio, setBio] = useState(
-    "This is the start of a new journey \n      filled with twists and turns 😊"
-  );
-
-  const colorPickerRef = useRef(null);
-  const editor = useMemo(() => withReact(createEditor()), []);
-
-  const handleClickOutside = (e) => {
-    if (colorPickerRef.current && !colorPickerRef.current.contains(e.target)) {
-      setShowPicker(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  const handleColorPickerClick = () => {
-    setShowPicker(!showPicker);
-  };
-
-  const [editorValue, setEditorValue] = useState([
-    {
-      type: "paragraph",
-      children: [
-        {
-          text: "This is the start of a new journey filled with twists and turns 😊",
-        },
-      ],
-    },
+function UserBiography({ tempTheme, setTempTheme }) {
+  const textareaRef = useRef(null);
+  const [emojiData] = useState([
+    { emoji: "😀", name: "grinning_face" },
+    { emoji: "😃", name: "grinning_face_with_big_eyes" },
+    { emoji: "😄", name: "grinning_face_with_smiling_eyes" },
+    { emoji: "😊", name: "smiling_face_with_smiling_eyes" },
+    { emoji: "😎", name: "smiling_face_with_sunglasses" },
+    { emoji: "😍", name: "smiling_face_with_heart_eyes" },
+    { emoji: "🙂", name: "slightly_smiling_face" },
+    { emoji: "🤩", name: "star-struck" },
+    { emoji: "😋", name: "face_savoring_food" },
+    { emoji: "😉", name: "winking_face" },
+    { emoji: "😆", name: "grinning_squinting_face" },
+    { emoji: "😁", name: "grinning_face_with_smiling_eyes" },
+    { emoji: "😘", name: "face_blowing_a_kiss" },
+    { emoji: "🥰", name: "smiling_face_with_hearts" },
+    { emoji: "😗", name: "kissing_face" },
+    { emoji: "😙", name: "kissing_face_with_smiling_eyes" },
+    { emoji: "😚", name: "kissing_face_with_closed_eyes" },
+    { emoji: "😛", name: "face_with_tongue" },
+    { emoji: "😜", name: "winking_face_with_tongue" },
+    { emoji: "🤪", name: "zany_face" },
+    { emoji: "🤨", name: "face_with_raised_eyebrow" },
+    { emoji: "🧐", name: "face_with_monocle" },
+    { emoji: "🤓", name: "nerd_face" },
+    { emoji: "😝", name: "squinting_face_with_tongue" },
+    // Add more emojis here...
   ]);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredEmojis, setFilteredEmojis] = useState(emojiData);
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const formattedValue = value.replace(/_/g, " ").replace(/\s+/g, "_");
+    setSearchTerm(formattedValue);
+
+    const filteredEmojis = emojiData.filter((emoji) =>
+      emoji.name.includes(formattedValue.toLowerCase())
+    );
+    setFilteredEmojis(filteredEmojis);
+  };
+
+  const insertEmoji = (emoji) => {
+    const textarea = textareaRef.current;
+    const { selectionStart, selectionEnd, value } = textarea;
+    const updatedValue =
+      value.substring(0, selectionStart) +
+      emoji +
+      value.substring(selectionEnd);
+    textarea.value = updatedValue;
+
+    // Set the cursor position after the inserted emoji
+    const cursorPosition = selectionStart + emoji.length;
+    textarea.setSelectionRange(cursorPosition, cursorPosition);
+
+    // Trigger the input event to update any event listeners or bindings
+    const event = new Event("input", { bubbles: true });
+    textarea.dispatchEvent(event);
+
+    setTempTheme((prevState) => ({
+      ...prevState,
+      userBio: updatedValue,
+    }));
+
+    // Set focus to the textarea
+    textarea.focus();
+  };
+
+  const handleKeyUp = (event) => {
+    const { value } = event.target;
+
+    setTempTheme((prevState) => ({
+      ...prevState,
+      userBio: value,
+    }));
+  };
+
   return (
-    <div>
-      <div className="displayFlex height50 alighnItemsCenter">
-        <div className="width100">User Bio:</div>
-        <div ref={colorPickerRef} id="colorPickerContainer">
-          <div className="color-picker-input" onClick={handleColorPickerClick}>
-            <span className="material-icons custom-icon-style">
-              text_fields
-            </span>
-            <div className="displayFlex smallIcon customIcon">
-              <span className="material-icons customIconStyle" id="pencil">
-                edit
-              </span>
+    <div className="displayFlex" style={{ minHeight: "160px" }}>
+      <textarea ref={textareaRef} id="textAreaBio" onKeyUp={handleKeyUp}>
+        {tempTheme?.userBio}
+      </textarea>
+      <div className="emoji-picker">
+        <input
+          type="text"
+          placeholder="Search Emoji by Name"
+          style={{ backgroundColor: "#181624" }}
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+
+        <div className="emoji-container">
+          {filteredEmojis.map((emoji, index) => (
+            <div
+              className="emoji"
+              key={index}
+              title={emoji.name}
+              onClick={() => insertEmoji(emoji.emoji)}
+            >
+              {emoji.emoji}
             </div>
-          </div>
-          {showPicker && (
-            <div className="custom-overlay">
-              <Slate
-                editor={editor}
-                value={editorValue}
-                onChange={setEditorValue}
-              >
-                <OverLay showPicker={showPicker} bio={bio} setBio={setBio} />
-              </Slate>
-            </div>
-          )}
+          ))}
         </div>
-      </div>
-      <div style={{ opacity: "0.4", padding: "25px", paddingTop: "10px" }}>
-        This is the start of a new journey filled with twists and turns 😊
       </div>
     </div>
   );
-};
+}
 
-export default UserBio;
+export default UserBiography;

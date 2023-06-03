@@ -47,6 +47,32 @@ const themeSchema = new mongoose.Schema({
     b: { type: Number },
     a: { type: Number },
   },
+  userBio: {
+    type: String,
+    default:
+      "This is the start of a new journey filled with twists and turns 😊",
+  },
+  bio: {
+    r: { type: Number },
+    g: { type: Number },
+    b: { type: Number },
+    a: { type: Number },
+  },
+  ct: {
+    r: { type: Number },
+    g: { type: Number },
+    b: { type: Number },
+    a: { type: Number },
+  },
+  bottomURL: {
+    type: String,
+  },
+  bottomURLArray: {
+    type: [String],
+    default: [
+      "https://clipartix.com/wp-content/uploads/2016/05/Grass-clipart-0.png",
+    ],
+  },
 });
 
 const userSchema = new mongoose.Schema(

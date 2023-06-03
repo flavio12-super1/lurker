@@ -3,11 +3,13 @@
   display: flex;
   justify-content: center;
   padding: 5px;
+  position: relative;
 }
 #profileOuterDiv {
-  background-color: #2a273e;
+  /* background-color: #2a273e; */
   color: white;
   height: 100%;
+  z-index: 1;
 }
 #banner {
   width: 100%;
@@ -56,6 +58,7 @@
 }
 #userBioDiv {
   font-size: 18px;
+  white-space: break-spaces;
 }
 .countElement {
   display: flex;
@@ -151,12 +154,14 @@
   width: 100%;
   box-sizing: border-box;
   padding: 5px;
+  position: relative;
 }
 #preview {
   overflow: auto;
   background-color: #2a273e;
   max-width: 300px;
   width: 78%;
+  z-index: 1;
 }
 
 /* user settings */
@@ -177,4 +182,50 @@
   height: 4px;
   background: linear-gradient(90deg, #000000cf, #0000008c);
   margin-bottom: 10px;
+}
+
+.settingsOptionOuterDivBio {
+  align-items: center;
+  background: linear-gradient(90deg, #0000008a, #0000002b);
+  display: flex;
+  justify-content: space-between;
+  min-height: 50px;
+  padding-left: 5px;
+  padding-right: 5px;
+  flex-direction: column;
+}
+.settingsOptionInnerDivBio {
+  width: 100%;
+  display: flex;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+}
+.bioText {
+  width: -webkit-fill-available;
+  padding: 25px;
+  color: gray;
+}
+#textAreaBio {
+  background-color: #18162d;
+  color: #fff;
+  flex-grow: 1;
+  font-size: 16px;
+  line-height: 1;
+  outline: none;
+  padding: 5px;
+  resize: none;
+  width: 556px;
+  height: auto;
+  border: solid black;
+}
+
+#BottomImage {
+  /* width: -webkit-fill-available; */
+  background-position: 50%;
+  background-size: cover;
+  position: absolute;
+  bottom: 5px;
+  height: calc(100% - 10px);
+  width: calc(100% - 10px);
 }

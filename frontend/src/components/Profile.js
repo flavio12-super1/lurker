@@ -53,6 +53,16 @@ function Profile() {
             a: 1,
           },
           uc: response.data.theme?.uc || { r: 127, g: 255, b: 250, a: 1 },
+          userBio:
+            response.data.theme?.userBio ||
+            "This is the start of a new journey filled with twists and turns 😊",
+          bio: response.data.theme?.bio || { r: 255, g: 255, b: 255, a: 1 },
+          ct: response.data.theme?.ct || { r: 147, g: 192, b: 255, a: 1 },
+          dc: response.data.theme?.dc || { r: 211, g: 182, b: 52, a: 1 },
+          bottomURL:
+            response.data.theme?.bottomURL ||
+            "https://clipartix.com/wp-content/uploads/2016/05/Grass-clipart-0.png",
+          bottomURLArray: response.data.theme?.bottomURLArray || [],
         });
         return true;
       }
@@ -223,18 +233,22 @@ function Profile() {
         </div>
         {/* User Bio: */}
         <div>
-          <div className="settingsOptionOuterDiv">
-            <div className="settingsOptionInnerDiv">
-              <UserBiography />
+          <div className="settingsOptionOuterDivBio">
+            <div className="settingsOptionInnerDivBio">
+              <div className="settingsOptionInnerDiv">User Bio:</div>
+              <ColorPicker
+                tempTheme={tempTheme}
+                colorKey="bio"
+                setTempTheme={setTempTheme}
+              />
+            </div>
+            <div className="bioText">
+              <UserBiography
+                tempTheme={tempTheme}
+                setTempTheme={setTempTheme}
+              />
             </div>
             {/* <UserBio /> */}
-          </div>
-          <div className="editDivider"></div>
-        </div>
-        {/* Bio color: */}
-        <div>
-          <div className="settingsOptionOuterDiv">
-            <div className="settingsOptionInnerDiv">Bio Color: </div>
           </div>
           <div className="editDivider"></div>
         </div>
@@ -242,6 +256,11 @@ function Profile() {
         <div>
           <div className="settingsOptionOuterDiv">
             <div className="settingsOptionInnerDiv">Count Color: </div>
+            <ColorPicker
+              tempTheme={tempTheme}
+              colorKey="ct"
+              setTempTheme={setTempTheme}
+            />
           </div>
           <div className="editDivider"></div>
         </div>
@@ -249,13 +268,27 @@ function Profile() {
         <div>
           <div className="settingsOptionOuterDiv">
             <div className="settingsOptionInnerDiv">Divider Color: </div>
+            <ColorPicker
+              tempTheme={tempTheme}
+              colorKey="dc"
+              setTempTheme={setTempTheme}
+            />
           </div>
           <div className="editDivider"></div>
         </div>
         {/* Bottom Image: */}
         <div>
           <div className="settingsOptionOuterDiv">
-            <div className="settingsOptionInnerDiv">Bottom Image: </div>
+            <div className="settingsOptionInnerDiv">
+              <ProfileImage
+                tempTheme={tempTheme}
+                text="Bottom Image"
+                id="bottomImage"
+                uploadKey="bottomURL"
+                uploadListKey="bottomURLArray"
+                setTempTheme={setTempTheme}
+              />
+            </div>
           </div>
           <div className="editDivider"></div>
         </div>
@@ -316,25 +349,56 @@ function Profile() {
               </div>
             </div>
             <div className="profileElement">
-              <div id="userBioDiv">
-                This is the start of a new journey filled with twists and turns
-                😊
+              <div
+                id="userBioDiv"
+                style={{
+                  color: `rgba(${tempTheme?.bio.r}, ${tempTheme?.bio.g}, ${tempTheme?.bio.b}, ${tempTheme?.bio.a})`,
+                }}
+              >
+                {tempTheme?.userBio}
               </div>
             </div>
             <div className="profileElement countElement">
               <div className="innerCountElement">
                 <div className="count">0</div>
-                <div className="word">followers</div>
+                <div
+                  className="word"
+                  style={{
+                    color: `rgba(${tempTheme?.ct.r}, ${tempTheme?.ct.g}, ${tempTheme?.ct.b}, ${tempTheme?.ct.a})`,
+                  }}
+                >
+                  followers
+                </div>
               </div>
 
               <div className="innerCountElement">
                 <div className="count">0</div>
-                <div className="word">following</div>
+                <div
+                  className="word"
+                  style={{
+                    color: `rgba(${tempTheme?.ct.r}, ${tempTheme?.ct.g}, ${tempTheme?.ct.b}, ${tempTheme?.ct.a})`,
+                  }}
+                >
+                  following
+                </div>
               </div>
             </div>
-            <div id="media">No Posts, kinda sus 🤔</div>
+            <div
+              id="media"
+              style={{
+                borderTop: `solid rgba(${tempTheme?.dc.r}, ${tempTheme?.dc.g}, ${tempTheme?.dc.b}, ${tempTheme?.dc.a})`,
+              }}
+            >
+              No Posts, kinda sus 🤔
+            </div>
           </div>
         </div>
+        <div
+          id="BottomImage"
+          style={{
+            backgroundImage: `url("${tempTheme.bottomURL}")`,
+          }}
+        ></div>
       </div>
     );
   };
@@ -476,22 +540,48 @@ function Profile() {
             </div>
           </div>
           <div className="profileElement">
-            <div id="userBioDiv">
-              This is the start of a new journey filled with twists and turns 😊
+            <div
+              id="userBioDiv"
+              style={{
+                color: `rgba(${theme?.bio.r}, ${theme?.bio.g}, ${theme?.bio.b}, ${theme?.bio.a})`,
+              }}
+            >
+              {theme?.userBio}
             </div>
           </div>
           <div className="profileElement countElement">
             <div className="innerCountElement">
               <div className="count">0</div>
-              <div className="word">followers</div>
+              <div
+                className="word"
+                style={{
+                  color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
+                }}
+              >
+                followers
+              </div>
             </div>
 
             <div className="innerCountElement">
               <div className="count">0</div>
-              <div className="word">following</div>
+              <div
+                className="word"
+                style={{
+                  color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
+                }}
+              >
+                following
+              </div>
             </div>
           </div>
-          <div id="media">No Posts, kinda sus 🤔</div>
+          <div
+            id="media"
+            style={{
+              borderTop: `solid rgba(${theme?.dc.r}, ${theme?.dc.g}, ${theme?.dc.b}, ${theme?.dc.a})`,
+            }}
+          >
+            No Posts, kinda sus 🤔
+          </div>
         </div>
         {overlay ? <OverLay theme={theme} /> : null}
       </div>
@@ -508,6 +598,12 @@ function Profile() {
       <div id="profileOuterDiv">
         {user != null ? <ProfilePage /> : <div>This user does not exist</div>}
       </div>
+      <div
+        id="BottomImage"
+        style={{
+          backgroundImage: `url("${theme.bottomURL}")`,
+        }}
+      ></div>
     </div>
   );
 }

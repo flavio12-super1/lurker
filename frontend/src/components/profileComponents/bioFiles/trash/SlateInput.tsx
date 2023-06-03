@@ -18,7 +18,7 @@ import {
 } from "slate-react";
 
 import { withHistory, HistoryEditor } from "slate-history";
-import { EventContext } from "./UserBiography";
+import { EventContext } from "./UserBiographyBackup";
 
 type CustomElement = { type: "paragraph"; children: CustomText[] };
 type CustomText = { text: string; bold?: true };
@@ -31,35 +31,65 @@ declare module "slate" {
   }
 }
 
-const initialValue: Descendant[] = [
-  {
-    type: "paragraph",
-    children: [{ text: "This is my Bio" }],
-  },
-];
+// const initialValue: Descendant[] = [
+//   {
+//     type: "paragraph",
+//     children: [{ text: "This is my Bio" }],
+//   },
+// ];
 
 function SlateInput(props: any) {
   const editor = useMemo(() => {
     return withHistory(withReact(createEditor()));
   }, []);
 
+  const userData = useContext(EventContext);
+  const { showEmojiOverLay, selectedEmoji, setSelectedEmoji, bio } = userData;
+
+  const initialValue: Descendant[] = [
+    {
+      type: "paragraph",
+      children: [{ text: bio }],
+    },
+  ];
+
+  // function sendMessage() {
+  //   let x = JSON.parse(JSON.stringify(editor));
+
+  //   Transforms.delete(editor, {
+  //     at: {
+  //       anchor: Editor.start(editor, []),
+  //       focus: Editor.end(editor, []),
+  //     },
+  //   });
+  //   props.onMessageSubmit(x.children);
+  // }
   function sendMessage() {
     let x = JSON.parse(JSON.stringify(editor));
-
-    Transforms.delete(editor, {
-      at: {
-        anchor: Editor.start(editor, []),
-        focus: Editor.end(editor, []),
-      },
-    });
     props.onMessageSubmit(x.children);
   }
 
+  // const handleKeyPress = (event: any) => {
+  //   if (!event.shiftKey && event.which === 13) {
+  //     event.preventDefault();
+  //     sendMessage();
+  //   } else if (event.which === 32) {
+  //     // Spacebar
+  //     event.preventDefault();
+  //     const selection = editor.selection;
+  //     if (!selection) {
+  //       return;
+  //     } // guard against null selection
+
+  //     const [start] = Editor.edges(editor, selection);
+  //     Transforms.insertText(editor, " ", { at: start });
+  //     Transforms.insertText(editor, " ", { at: start });
+  //     Transforms.delete(editor, { distance: 1, at: start });
+  //   }
+  // };
+
   const handleKeyPress = (event: any) => {
-    if (!event.shiftKey && event.which === 13) {
-      event.preventDefault();
-      sendMessage();
-    } else if (event.which === 32) {
+    if (event.which === 32) {
       // Spacebar
       event.preventDefault();
       const selection = editor.selection;
@@ -69,13 +99,11 @@ function SlateInput(props: any) {
 
       const [start] = Editor.edges(editor, selection);
       Transforms.insertText(editor, " ", { at: start });
-      Transforms.insertText(editor, " ", { at: start });
+      // Transforms.insertText(editor, " ", { at: start });
       Transforms.delete(editor, { distance: 1, at: start });
     }
+    sendMessage();
   };
-
-  const userData = useContext(EventContext);
-  const { showEmojiOverLay, selectedEmoji, setSelectedEmoji } = userData;
 
   const insertEmoji = (emoji: string) => {
     const selection = editor.selection;
@@ -86,6 +114,7 @@ function SlateInput(props: any) {
     const [start] = Editor.edges(editor, selection);
     Transforms.insertText(editor, emoji, { at: start });
     setSelectedEmoji("");
+    sendMessage();
   };
 
   useEffect(() => {
@@ -112,7 +141,7 @@ function SlateInput(props: any) {
         <Editable
           spellCheck
           placeholder="Dont be shy : )"
-          onKeyDown={(event) => handleKeyPress(event)}
+          onKeyUp={(event) => handleKeyPress(event)}
           id="txtInput"
         />
       </Slate>

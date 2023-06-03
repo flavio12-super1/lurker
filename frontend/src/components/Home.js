@@ -1,7 +1,12 @@
 import React from "react";
 
-function Home() {
-  return <div>Lurker</div>;
+function Home(props) {
+  return (
+    <div>
+      <div>Lurker</div>
+      <div>{props.page}</div>
+    </div>
+  );
 }
 
 export default Home;

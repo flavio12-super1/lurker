@@ -259,30 +259,6 @@ app.post("/login", loginLimiter, async (req, res) => {
   }
 });
 
-// app.post("/signup", loginLimiter, async (req, res) => {
-//   const { email, password } = req.body;
-//   try {
-//     if (!(validateEmail(email) && validatePassword(password))) {
-//       console.log("invalid or empty fields");
-//       res.status(401).json({ error: "invalid or empty fields" });
-//     } else {
-//       const existingUser = await User.findOne({ email });
-//       if (existingUser) {
-//         console.log("User with this email already exists");
-//         res.status(409).json({ error: "User with this email already exists" });
-//       } else {
-//         const hashedPassword = await bcrypt.hash(password, saltRounds);
-//         const user = new User({ email, password: hashedPassword });
-//         await user.save();
-//         res.status(201).json({ message: "User created" });
-//       }
-//     }
-//   } catch (error) {
-//     // Handle the error appropriately
-//     console.error(error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
 app.post("/signup", loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -315,6 +291,15 @@ app.post("/signup", loginLimiter, async (req, res) => {
           ],
           borderColor: { r: 28, g: 24, b: 38, a: 1 },
           uc: { r: 127, g: 255, b: 250, a: 1 },
+          userBio:
+            "This is the start of a new journey filled with twists and turns 😊",
+          bio: { r: 255, g: 255, b: 255, a: 1 },
+          ct: { r: 147, g: 192, b: 255, a: 1 },
+          bottomURL:
+            "https://clipartix.com/wp-content/uploads/2016/05/Grass-clipart-0.png",
+          bottomURLArray: [
+            "https://clipartix.com/wp-content/uploads/2016/05/Grass-clipart-0.png",
+          ],
         };
 
         const user = new User({
