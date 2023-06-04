@@ -75,11 +75,56 @@ const themeSchema = new mongoose.Schema({
   },
 });
 
+const replySchema = new mongoose.Schema({
+  replyId: {
+    type: String,
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  replies: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Reply",
+    },
+  ],
+});
+
+const Reply = mongoose.model("Reply", replySchema);
+
 const postSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  content: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  // Add other post fields as needed
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  replyId: {
+    type: String,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  replies: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Reply",
+    },
+  ],
 });
 
 const Post = mongoose.model("Post", postSchema);
@@ -129,4 +174,4 @@ userSchema.methods.isValidPassword = async function (password) {
 };
 
 const User = mongoose.model("User", userSchema); // Create the User model
-module.exports = { User, Post }; // Export the User model
+module.exports = { User, Post, Reply }; // Export the User model
