@@ -1,21 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-// const userSchema = require("../models/userSchema");
 
-// const User = mongoose.model("User", userSchema);
 const { User } = require("../models/userSchema");
 
 async function getNotificaitons(notifications) {
   const promises = notifications.map((notification) => {
-    return User.findById(notification.userID).select("email").lean().exec();
+    return User.findById(notification.userID)
+      .select("email")
+      .populate("theme.imageURL")
+      .lean()
+      .exec();
   });
   const results = await Promise.all(promises);
+  console.log(results);
   const notificationsWithUsername = results.map((result, index) => {
     return {
       id: notifications[index].id,
       userID: notifications[index].userID,
       email: result.email,
+      imageURL: result.theme.imageURL,
     };
   });
 
@@ -24,18 +28,23 @@ async function getNotificaitons(notifications) {
 
 async function getFriends(friends) {
   const promises = friends?.map((friend) => {
-    return User.findById(friend.userID).select("email").lean().exec();
+    return User.findById(friend.userID)
+      .select("email")
+      .populate("theme.imageURL")
+      .lean()
+      .exec();
   });
   const results = await Promise.all(promises);
+  console.log(results);
   const friendsWithUsername = results.map((result, index) => {
     return {
       id: friends[index].id,
       userID: friends[index].userID,
       email: result.email,
+      imageURL: result.theme.imageURL,
       channelID: friends[index].channelID,
     };
   });
-
   return friendsWithUsername;
 }
 

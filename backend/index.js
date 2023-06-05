@@ -65,6 +65,7 @@ const sessionMiddleware = session({
     maxAge: 1000 * 60 * 60 * 24,
     secure: false,
   },
+  profileTheme: null,
 });
 
 app.use(sessionMiddleware);
@@ -224,6 +225,7 @@ app.post("/login", loginLimiter, async (req, res) => {
         token: token,
         userName: user.email,
         channelList: [],
+        profileTheme: user.theme ? user.theme : null,
       };
 
       res.json({ token, error: null, user });
@@ -296,15 +298,38 @@ app.post("/signup", loginLimiter, async (req, res) => {
   }
 });
 
+// app.get("/getUser", verifyJWT, async (req, res) => {
+//   const { email } = req.query;
+//   console.log(email);
+//   const existingUser = await User.findOne({ email });
+//   if (existingUser) {
+//     console.log("user exists");
+//     res.status(201).json({ message: "success", theme: existingUser.theme });
+//   } else {
+//     console.log("user does not exist");
+//     res.status(409).json({ message: "error" });
+//   }
+// });
+
 app.get("/getUser", verifyJWT, async (req, res) => {
   const { email } = req.query;
   console.log(email);
+
+  if (email === req.session.user.userName) {
+    // User is searching for their own profile
+    console.log("User is searching for their own profile");
+    res
+      .status(201)
+      .json({ message: "success", theme: req.session.profileTheme });
+    return;
+  }
+
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    console.log("user exists");
+    console.log("User exists");
     res.status(201).json({ message: "success", theme: existingUser.theme });
   } else {
-    console.log("user does not exist");
+    console.log("User does not exist");
     res.status(409).json({ message: "error" });
   }
 });
@@ -463,6 +488,7 @@ io.on("connection", (socket) => {
       console.log(data);
       console.log(data.email + " made a friend request to: " + user.email);
       // console.log("user exists: " + user._id);
+      data.imageURL = session.user.profileTheme.imageURL;
 
       crypto.randomBytes(8, (err, buf) => {
         if (err) throw err;
@@ -477,6 +503,8 @@ io.on("connection", (socket) => {
         )
           .then((result) => {
             console.log(result);
+            data.id = id;
+            console.log(data);
             io.to(`${user._id}`).emit("friendRequest", data);
           })
           .catch((err) => {
@@ -503,6 +531,73 @@ io.on("connection", (socket) => {
   // const message = new Message({
   //   messageID: messageId,
   //   message: [messageData], // store message data as an array of Data objects
+  // });
+
+  // socket.on("acceptRequest", async (data) => {
+  //   try {
+  //     const user = await User.findById(data.userID);
+  //     if (!user) {
+  //       console.log("User does not exist");
+  //       return;
+  //     }
+
+  //     const messageId = crypto.randomBytes(16).toString("hex");
+  //     const message = new Message({
+  //       messageID: messageId,
+  //       message: [null],
+  //     });
+  //     const savedMessage = await message.save();
+
+  //     const channelID = crypto.randomBytes(16).toString("hex");
+  //     const channel = new Channel({
+  //       channelID: channelID,
+  //       members: [socket.userId, user._id],
+  //       messageReferanceID: savedMessage.messageID,
+  //     });
+  //     const savedChannel = await channel.save();
+
+  //     const packageData = {
+  //       userID: user._id,
+  //       email: user.email,
+  //       channelID: savedChannel.channelID,
+  //     };
+  //     console.log(packageData);
+
+  //     console.log(`${socket.userId} accepted ${user._id}'s friend request`);
+
+  //     await Promise.all([
+  //       User.updateOne(
+  //         { _id: user._id },
+  //         {
+  //           $push: {
+  //             friendList: {
+  //               userID: socket.userId,
+  //               channelID: savedChannel.channelID,
+  //             },
+  //           },
+  //         }
+  //       ).exec(),
+
+  //       User.updateOne(
+  //         { _id: socket.userId },
+  //         {
+  //           $push: {
+  //             friendList: {
+  //               userID: user._id,
+  //               channelID: savedChannel.channelID,
+  //             },
+  //           },
+  //         }
+  //       ).exec(),
+  //     ]);
+
+  //     io.to(socket.userId).emit("friendRequestAccepted", packageData);
+  //     io.to(user._id).emit("friendRequestAccepted", packageData);
+
+  //     console.log("Friend request accepted successfully.");
+  //   } catch (error) {
+  //     console.error("Error accepting friend request:", error);
+  //   }
   // });
 
   socket.on("acceptRequest", async (data) => {
@@ -556,11 +651,6 @@ io.on("connection", (socket) => {
         }
       )
         .then((result) => {
-          // const packageData = {
-          //   userID: socket.userId,
-          //   email: session.user.userName,
-          //   channelID: savedChannel.channelID,
-          // };
           const packageData = {
             userID: user._id,
             email: user.email,
@@ -596,15 +686,23 @@ io.on("connection", (socket) => {
 
           io.to(`${user._id}`).emit("friendRequestAccepted", packageData);
           console.log(result);
-          console.log(result);
+          User.updateOne(
+            { _id: socket.userId },
+            { $pull: { notifications: { id: data.id } } }
+          )
+            .then((result) => {
+              console.log(result);
+              console.log("notification removed: " + data.id);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+
+          console.log("notification removed: " + data.id);
         })
         .catch((err) => {
           console.error(err);
         });
-
-      // io.to(`${user._id}`)
-      //   .to(socket.userId)
-      //   .emit("friendRequestAccepted", package);
     } catch (error) {
       console.log("Error creating channel:", error);
     }
@@ -622,22 +720,6 @@ io.on("connection", (socket) => {
       console.log("User does not exist");
       return;
     }
-
-    // User.updateOne(
-    //   { _id: socket.userId },
-    //   {
-    //     $pull: {
-    //       notifications: data.id,
-    //     },
-    //   },
-    //   function (err, result) {
-    //     if (err) {
-    //       console.log(err);
-    //     } else {
-    //       console.log(result);
-    //     }
-    //   }
-    // );
 
     User.updateOne(
       { _id: socket.userId },

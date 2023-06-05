@@ -32,6 +32,7 @@ function Lurker(props) {
             email: user.email,
             id: user.id,
             userID: user.userID,
+            imageURL: user.imageURL,
           })),
           ...notification,
         ]);
@@ -40,6 +41,7 @@ function Lurker(props) {
             email: user.email,
             id: user.id,
             userID: user.userID,
+            imageURL: user.imageURL,
             channelID: user.channelID,
           })),
           ...friend,

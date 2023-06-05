@@ -229,3 +229,16 @@
   height: calc(100% - 10px);
   width: calc(100% - 10px);
 }
+
+#sendMessage {
+  display: flex;
+  align-items: center;
+  margin-right: 5px;
+  border: solid #1c1826;
+  border-radius: 25px;
+  width: 35px;
+  justify-content: center;
+  padding-left: 2px;
+  background-color: black;
+  cursor: pointer;
+}

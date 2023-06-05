@@ -15,7 +15,7 @@ router.post("/", async (req, res, next) => {
 
   // Update the profileTheme array in the session
   req.session.profileTheme = req.session.profileTheme || []; // Initialize the array if it doesn't exist
-  req.session.profileTheme.push(theme);
+  req.session.profileTheme = theme;
   const userId = req.userId; // Assuming you have the user's ID in the session
   try {
     // Update the user's document in the database with the selected theme

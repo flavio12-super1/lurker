@@ -38,6 +38,12 @@ function Messages() {
     setRoom({ room: channelID });
   }, [channelID]);
 
+  useEffect(() => {
+    console.log("friendsList: " + JSON.stringify(friendsList));
+  }, [friendsList]);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+
   //update room
   useEffect(() => {
     if (room.room != null) {
@@ -219,18 +225,68 @@ function Messages() {
       navigate("/lurker/channel/messages/" + channelID);
     });
   };
-  //render friend list
-  const renderFriendList = () => {
-    return friendsList.map((data, index) => (
-      <div key={index} id="">
-        <div className="">
-          <button className="" onClick={() => handleNavigate(data.channelID)}>
-            {data.email}
-          </button>
-        </div>
-      </div>
-    ));
+  const navigateToProfile = (email) => {
+    navigate("/lurker/" + email);
   };
+  //render friend list
+  // const renderFriendList = () => {
+  //   return friendsList.map((data, index) => (
+  //     <div key={index} id="">
+  //       <div className="">
+  //         {/* <img src={data.imageURL} alt="" style={{ width: "55px" }} /> */}
+
+  //         <img
+  //           src={data.imageURL}
+  //           alt=""
+  //           style={{ width: "55px", display: "block" }}
+  //         />
+
+  //         <button className="" onClick={() => handleNavigate(data.channelID)}>
+  //           {data.email}
+  //         </button>
+  //       </div>
+  //     </div>
+  //   ));
+  // };
+  // Render friend list
+  const renderFriendList = () => {
+    return friendsList.map((data, index) => {
+      // Check if the channelID matches the channelId from URL params
+      const isSelected = data.channelID === channelID;
+
+      return (
+        <div key={index} id="">
+          <div className="">
+            {/* <img src={data.imageURL} alt="" style={{ width: "55px" }} /> */}
+            <img
+              src={data.imageURL}
+              alt=""
+              style={{
+                width: "55px",
+                display: "block",
+                border: isSelected ? "2px solid blue" : "none",
+              }}
+            />
+            <button className="" onClick={() => handleNavigate(data.channelID)}>
+              {data.email}
+            </button>
+          </div>
+        </div>
+      );
+    });
+  };
+
+  useEffect(() => {
+    // Find the user object that matches the selected channelID
+    const selectedUser = friendsList.find(
+      (data) => data.channelID === channelID
+    );
+    setSelectedUser(selectedUser);
+  }, [friendsList, channelID]);
+
+  useEffect(() => {
+    console.log("selected user: " + JSON.stringify(selectedUser));
+  }, [selectedUser]);
 
   //handle image uploads
   const [files, setFiles] = useState([]);
@@ -450,6 +506,29 @@ function Messages() {
 
           {channelID != null ? (
             <div id="chatDiv">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  borderBottom: "solid black",
+                }}
+              >
+                <div>
+                  <img
+                    src={selectedUser?.imageURL}
+                    alt=""
+                    style={{ width: "100px" }}
+                  />
+                  <div>
+                    profile name (might allow users to create profiles names){" "}
+                  </div>
+                  <button
+                    onClick={() => navigateToProfile(selectedUser?.email)}
+                  >
+                    view profile
+                  </button>
+                </div>
+              </div>
               <div id="chatMessagesDiv" ref={chatContainerRef}>
                 <div style={{ overflowAnchor: "none" }}>
                   <div>

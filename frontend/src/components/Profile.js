@@ -12,7 +12,7 @@ export const ColorPickerContext = createContext();
 
 function Profile() {
   const userData = useContext(UserContext);
-  const { socket, myEmail, userID } = userData;
+  const { socket, myEmail, userID, friendsList } = userData;
   const { username } = useParams();
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState(null);
@@ -97,6 +97,10 @@ function Profile() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  const sendUnfollowRequest = () => {
+    console.log("unfollow");
+  };
 
   const sendFollowRequest = () => {
     const data = {
@@ -480,10 +484,34 @@ function Profile() {
     );
   };
 
+  // const checkIfFollowing = () => {
+  //   console.log(friendsList);
+  //   if (friendsList.includes(username)) {
+  //     return <div onClick={() => sendUnfollowRequest()}>unfollow</div>;
+  //   }
+  //   return <div onClick={() => sendFollowRequest()}>follow</div>;
+  // };
+  const checkIfFollowing = () => {
+    console.log(friendsList);
+    const isFollowing = friendsList.some((friend) => friend.email === username);
+
+    if (isFollowing) {
+      return <div onClick={() => sendUnfollowRequest()}>unfollow</div>;
+    }
+
+    return <div onClick={() => sendFollowRequest()}>follow</div>;
+  };
+
   const OtherUser = () => {
     return (
-      <div id="editProfileBtn">
-        <div onClick={() => sendFollowRequest()}>follow</div>
+      <div className="displayFlex">
+        <div id="sendMessage">
+          <span className="material-icons">send</span>
+        </div>
+        <div id="editProfileBtn">
+          {/* <div onClick={() => sendFollowRequest()}>follow</div> */}
+          {checkIfFollowing()}
+        </div>
       </div>
     );
   };

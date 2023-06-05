@@ -37,6 +37,11 @@ function Notifications() {
       <div key={index} id="notificationOuterDiv">
         <div className="notificationInformation">
           Friend request from: {data.userID}
+          <img
+            src={data.imageURL}
+            alt="imageURL"
+            className="friendRequestImageURL"
+          />
           <button
             className="notificationEmailBtn"
             onClick={() => handleNavigate(data.email)}
@@ -62,13 +67,13 @@ function Notifications() {
     ));
   };
   return (
-    <div id="messagesOuterDiv">
+    <div id="notificationsPage">
       <div id="messagesNavContainer">
         <div id="searchMessages">
           <div id="messagesNavSearch">
             <div id="messagesNavSearchDiv">
               <input
-                id="messagesNavSearchDivInput"
+                id="notificationsNavSearchDivInput"
                 value={searchNotification}
                 onChange={(e) => setsearchNotification(e.target.value)}
                 placeholder="search notifications"
@@ -113,7 +118,7 @@ function Notifications() {
       </div>
       {/* binoculars.png */}
       <div id="messagesInnerDivContainer">
-        <div id="messagesInnerDiv">
+        <div id="notificationsInnerDiv">
           <div>{renderNotifications()}</div>
           <div>{renderFriendRequests()}</div>
         </div>

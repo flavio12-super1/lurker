@@ -95,6 +95,80 @@ router.get("/", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+// router.get("/", async (req, res) => {
+//   try {
+//     // Retrieve the user from the database based on the user's ID
+//     const user = await User.findById(req.userId); // Assuming you have the userId available in the request
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     let { page, pageSize } = req.query;
+//     page = parseInt(page);
+//     pageSize = parseInt(pageSize);
+
+//     // Calculate the starting index based on the page and pageSize
+//     const startIndex = (page - 1) * pageSize;
+
+//     // Retrieve the post IDs based on the startIndex and pageSize
+//     const postIds = user.posts.slice(startIndex, startIndex + pageSize);
+
+//     // Retrieve the posts based on the IDs and sort them in the order of the IDs
+//     const posts = await Post.find({ _id: { $in: postIds } }).sort({ _id: -1 });
+
+//     // Check if there are more posts available
+//     const hasMorePosts = user.posts.length > startIndex + pageSize;
+
+//     // Function to recursively retrieve nested replies for a reply
+//     const retrieveNestedReplies = async (reply, userMap) => {
+//       const nestedReplies = await Reply.find({ _id: { $in: reply.replies } });
+//       const nestedRepliesWithNested = await Promise.all(
+//         nestedReplies.map(async (nestedReply) => {
+//           const nestedUser = userMap.get(nestedReply.user.toString());
+//           if (!nestedUser) {
+//             const user = await User.findById(nestedReply.user);
+//             userMap.set(nestedReply.user.toString(), user);
+//             return { ...nestedReply.toObject(), user: user.toObject() };
+//           }
+//           return { ...nestedReply.toObject(), user: nestedUser.toObject() };
+//         })
+//       );
+//       return nestedRepliesWithNested;
+//     };
+
+//     // Retrieve nested replies for each post
+//     const userMap = new Map(); // Map to store user information
+//     const postsWithReplies = await Promise.all(
+//       posts.map(async (post) => {
+//         const postUser = userMap.get(post.user.toString());
+//         if (!postUser) {
+//           const user = await User.findById(post.user);
+//           userMap.set(post.user.toString(), user);
+//           post.user = user.toObject();
+//         } else {
+//           post.user = postUser.toObject();
+//         }
+
+//         const replies = await Reply.find({ _id: { $in: post.replies } });
+//         const repliesWithNested = await Promise.all(
+//           replies.map(async (reply) => {
+//             const nestedReplies = await retrieveNestedReplies(reply, userMap);
+//             return { ...reply.toObject(), replies: nestedReplies };
+//           })
+//         );
+//         return { ...post.toObject(), replies: repliesWithNested };
+//       })
+//     );
+
+//     console.log(postsWithReplies);
+
+//     return res.json({ posts: postsWithReplies, hasMorePosts: hasMorePosts });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 
 router.post("/:postId/replies", async (req, res) => {
   try {
