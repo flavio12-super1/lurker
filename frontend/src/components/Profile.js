@@ -7,12 +7,22 @@ import { UserContext } from "./Lurker";
 import ColorPicker from "./profileComponents/colorPickerFiles/ColorPicker";
 import ProfileImage from "./profileComponents/profileImageFiles/ProfileImage";
 import UserBiography from "./profileComponents/bioFiles/UserBiography";
+import CountOverlay from "./profileComponents/countOverlayFiles/CountOverlay";
+// import CountOverlayOther from "./profileComponents/countOverlayFiles/CountOverlayOther";
 import "../styles/Profile.css";
 export const ColorPickerContext = createContext();
 
 function Profile() {
   const userData = useContext(UserContext);
-  const { socket, myEmail, userID, friendsList } = userData;
+  const {
+    socket,
+    myEmail,
+    userID,
+    friendsList,
+    following,
+    currentlyViewing,
+    setCurrentlyViewing,
+  } = userData;
   const { username } = useParams();
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState(null);
@@ -23,18 +33,25 @@ function Profile() {
     setOverlay(!overlay);
   };
 
+  // const [countFollowersOverlay, setCountFollowersOverlay] = useState(false);
+  // const [countFollowingOverlay, setCountFollowingOverlay] = useState(false);
+  // const toggleFollowersCountOverlay = () => {
+  //   setCountFollowersOverlay(!countFollowersOverlay);
+  // };
+  // const toggleFollowingCountOverlay = () => {
+  //   setCountFollowingOverlay(!countFollowingOverlay);
+  // };
+
   async function checkUserExists(user) {
     try {
-      const response = await axiosInstance.get("/getUser", {
-        params: {
-          email: username,
-        },
+      const response = await axiosInstance.post("/getUser", {
+        email: username,
       });
       console.log(response.data.message);
       if (response.data.message === "success") {
-        console.log("success");
-        console.log(response.data.theme?.bc);
+        console.log("get user: " + JSON.stringify(response.data.user));
         setUser(user);
+        setCurrentlyViewing(response.data.user);
         setTheme({
           bc: response.data.theme?.bc || { r: 28, g: 24, b: 38, a: 1 },
           fg: response.data.theme?.fg || { r: 42, g: 39, b: 62, a: 1 },
@@ -74,13 +91,23 @@ function Profile() {
   }
 
   useEffect(() => {
-    axiosInstance
-      .get("/verify")
-      .then(async (response) => {
-        console.log(response.data);
-        console.log(response.data.username);
+    if (user) {
+      console.log("user: ", user);
+    }
+  }, [user]);
 
-        await checkUserExists(response.data.username);
+  useEffect(() => {
+    if (currentlyViewing) {
+      console.log("currently viewing user: ", JSON.stringify(currentlyViewing));
+    }
+  }, [currentlyViewing]);
+
+  useEffect(() => {
+    axiosInstance
+      .post("/verify")
+      .then(async (response) => {
+        console.log(response.data.user);
+        await checkUserExists(response.data.user.email);
       })
       .catch((error) => {
         console.log(error);
@@ -91,15 +118,21 @@ function Profile() {
   }, [username]);
 
   useEffect(() => {
-    console.log(theme?.bc.r);
+    if (theme) {
+      console.log("theme: ", theme);
+    }
   }, [theme]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  const sendUnfollowRequest = () => {
-    console.log("unfollow");
+  const sendUnfollowRequest = (userID) => {
+    socket.emit("unFollowUser", userID);
+  };
+
+  const followUser = (userID) => {
+    socket.emit("followUser", userID);
   };
 
   const sendFollowRequest = () => {
@@ -363,7 +396,7 @@ function Profile() {
               </div>
             </div>
             <div className="profileElement countElement">
-              <div className="innerCountElement">
+              <div className="hideInnerCountElement">
                 <div className="count">0</div>
                 <div
                   className="word"
@@ -375,7 +408,7 @@ function Profile() {
                 </div>
               </div>
 
-              <div className="innerCountElement">
+              <div className="hideInnerCountElement">
                 <div className="count">0</div>
                 <div
                   className="word"
@@ -491,15 +524,37 @@ function Profile() {
   //   }
   //   return <div onClick={() => sendFollowRequest()}>follow</div>;
   // };
+  // const checkIfFollowing = () => {
+  //   console.log(friendsList);
+  //   console.log("currently following: " + following.userID);
+  //   console.log("currently viewing: " + currentlyViewing._id);
+  //   const isFollowing = friendsList.some((friend) => friend.email === username);
+
+  //   if (isFollowing) {
+  //     return <div onClick={() => sendUnfollowRequest()}>unfollow</div>;
+  //   }
+
+  //   // return <div onClick={() => sendFollowRequest()}>follow</div>;
+  //   return <div onClick={() => followUser(currentlyViewing._id)}>follow</div>;
+  // };
   const checkIfFollowing = () => {
-    console.log(friendsList);
-    const isFollowing = friendsList.some((friend) => friend.email === username);
+    // console.log(friendsList);
+    console.log("currently following: " + JSON.stringify(following));
+    console.log("currently viewing: " + currentlyViewing._id);
+    const isFollowing = following.some(
+      (user) => user.userID === currentlyViewing._id
+    );
 
     if (isFollowing) {
-      return <div onClick={() => sendUnfollowRequest()}>unfollow</div>;
+      return (
+        <div onClick={() => sendUnfollowRequest(currentlyViewing._id)}>
+          unfollow
+        </div>
+      );
     }
 
-    return <div onClick={() => sendFollowRequest()}>follow</div>;
+    // return <div onClick={() => sendFollowRequest()}>follow</div>;
+    return <div onClick={() => followUser(currentlyViewing._id)}>follow</div>;
   };
 
   const OtherUser = () => {
@@ -577,30 +632,90 @@ function Profile() {
               {theme?.userBio}
             </div>
           </div>
-          <div className="profileElement countElement">
-            <div className="innerCountElement">
-              <div className="count">0</div>
-              <div
-                className="word"
-                style={{
-                  color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
-                }}
-              >
-                followers
+          {/* <div className="profileElement countElement">
+            <div className="outerCountElement">
+              <div className="innerCountElement">
+                <div className="count">{currentlyViewing.followers.length}</div>
+                <div
+                  className="word"
+                  style={{
+                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
+                  }}
+                >
+                  <CountOverlay
+                    text="followers"
+                    currentlyViewing={currentlyViewing}
+                    following={following}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="innerCountElement">
-              <div className="count">0</div>
-              <div
-                className="word"
-                style={{
-                  color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
-                }}
-              >
-                following
+            <div className="outerCountElement">
+              <div className="innerCountElement">
+                <div className="count">{currentlyViewing.following.length}</div>
+                <div
+                  className="word"
+                  style={{
+                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
+                  }}
+                >
+                  <CountOverlay
+                    text="following"
+                    currentlyViewing={currentlyViewing}
+                    following={following}
+                  />
+                </div>
               </div>
             </div>
+          </div> */}
+          <div className="profileElement countElement">
+            {/* <div className="outerCountElement">
+              <div className="innerCountElement">
+                <div className="count">{currentlyViewing.followers.length}</div>
+                <div
+                  className="word"
+                  style={{
+                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
+                  }}
+                >
+                  <CountOverlay
+                    text="followers"
+                    currentlyViewing={currentlyViewing}
+                    following={following}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="outerCountElement">
+              <div className="innerCountElement">
+                <div className="count">{currentlyViewing.following.length}</div>
+                <div
+                  className="word"
+                  style={{
+                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
+                  }}
+                >
+                  here
+                </div>
+              </div>
+            </div> */}
+
+            <CountOverlay
+              text="followers"
+              currentlyViewing={currentlyViewing}
+              following={following}
+              theme={theme}
+              count={currentlyViewing.followers.length}
+            />
+            <CountOverlay
+              text="following"
+              currentlyViewing={currentlyViewing}
+              following={following}
+              theme={theme}
+              count={currentlyViewing.following.length}
+            />
           </div>
           <div
             id="media"

@@ -220,12 +220,14 @@ app.post("/login", loginLimiter, async (req, res) => {
         expiresIn: 60 * 60 * 24,
       });
 
+      console.log(user.theme);
+
       req.session.user = {
         userId: user._id,
         token: token,
         userName: user.email,
         channelList: [],
-        profileTheme: user.theme ? user.theme : null,
+        profileTheme: user.theme,
       };
 
       res.json({ token, error: null, user });
@@ -311,28 +313,53 @@ app.post("/signup", loginLimiter, async (req, res) => {
 //   }
 // });
 
-app.get("/getUser", verifyJWT, async (req, res) => {
-  const { email } = req.query;
+app.post("/getUser", verifyJWT, async (req, res) => {
+  const { email } = req.body;
   console.log(email);
-
-  if (email === req.session.user.userName) {
-    // User is searching for their own profile
-    console.log("User is searching for their own profile");
-    res
-      .status(201)
-      .json({ message: "success", theme: req.session.profileTheme });
-    return;
-  }
-
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    console.log("User exists");
-    res.status(201).json({ message: "success", theme: existingUser.theme });
+    console.log("User exists: " + existingUser.email);
+    const { _id, email, followers, following } = existingUser;
+    const userData = { _id, email, followers, following };
+    res.status(201).json({
+      message: "success",
+      user: userData,
+      theme: existingUser.theme,
+    });
   } else {
-    console.log("User does not exist");
+    console.log("user does not exist");
     res.status(409).json({ message: "error" });
   }
 });
+
+// app.get("/getUser", verifyJWT, async (req, res) => {
+//   const { email } = req.query;
+//   console.log("get user: " + email);
+//   const existingUser = await User.findOne({ email });
+//   if (email === req.session.user.userName) {
+//     // User is searching for their own profile
+//     console.log("User is searching for their own profile");
+//     // res
+//     //   .status(201)
+//     //   .json({ message: "success", theme: req.session.profileTheme });
+//     res.status(201).json({ message: "success", theme: existingUser.theme });
+//     return;
+//   }
+
+//   if (existingUser) {
+//     console.log("User exists: " + existingUser.email);
+//     const { _id, email, theme } = existingUser;
+//     const userData = { _id, email, theme };
+//     res.status(201).json({
+//       message: "success",
+//       user: existingUser,
+//       theme: existingUser.theme,
+//     });
+//   } else {
+//     console.log("User does not exist");
+//     res.status(409).json({ message: "error" });
+//   }
+// });
 
 app.post("/mySearch", verifyJWT, async (req, res) => {
   const { search } = req.body;
@@ -735,6 +762,92 @@ io.on("connection", (socket) => {
     console.log("notification removed: " + data.id);
   });
 
+  // socket.on("followUser", async (userID) => {
+  //   console.log("followUser: " + userID);
+  //   User.updateOne(
+  //     { _id: socket.userId },
+  //     { $push: { following: { userID: userID } } }
+  //   )
+  //     .then((result) => {
+  //       console.log(result);
+  //       socket.emit("successFollow", userID);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+  // });
+  // socket.on("followUser", async (userID) => {
+  //   console.log("followUser: " + userID);
+  //   User.updateOne(
+  //     { _id: socket.userId },
+  //     { $push: { following: { userID: userID } } },
+  //     { new: true, projection: { following: 1 } } // Return only the updated 'following' object
+  //   )
+  //     .then((result) => {
+  //       console.log(result);
+  //       const updatedFollowing = result.following; // Updated 'following' object
+  //       socket.emit("successFollow", updatedFollowing);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+  // });
+  socket.on("followUser", async (userID) => {
+    console.log("followUser: " + userID);
+    User.findOneAndUpdate(
+      { _id: socket.userId },
+      { $push: { following: { userID: userID } } },
+      { new: true } // Return the updated document
+    )
+      .then((updatedUser) => {
+        console.log(updatedUser.following);
+        socket.emit("successFollowUpdate", updatedUser.following);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    User.findOneAndUpdate(
+      { _id: userID },
+      { $push: { followers: { userID: socket.userId } } },
+      { new: true } // Return the updated document
+    )
+      .then((updatedUser) => {
+        console.log(updatedUser.followers);
+        socket.emit("updateCurrentlyViewingFollowers", updatedUser.followers);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
+
+  socket.on("unFollowUser", async (userID) => {
+    console.log("unFollowUser: " + userID);
+    User.findOneAndUpdate(
+      { _id: socket.userId },
+      { $pull: { following: { userID: userID } } },
+      { new: true } // Return the updated document
+    )
+      .then((updatedUser) => {
+        console.log(updatedUser.following);
+        socket.emit("successFollowUpdate", updatedUser.following);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    User.findOneAndUpdate(
+      { _id: userID },
+      { $pull: { followers: { userID: socket.userId } } },
+      { new: true } // Return the updated document
+    )
+      .then((updatedUser) => {
+        console.log(updatedUser.followers);
+        socket.emit("updateCurrentlyViewingFollowers", updatedUser.followers);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
+
   socket.on("joinRoom", (room) => {
     //use socket.userID to check if user has access to room.room
 
@@ -808,6 +921,8 @@ const saveEdites = require("./routes/saveEdites");
 app.use("/saveEdits", verifyJWT, saveEdites);
 const userPosts = require("./routes/userPosts");
 app.use("/userPosts", verifyJWT, userPosts);
+const count = require("./routes/count");
+app.use("/count", verifyJWT, count);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -821,12 +936,13 @@ app.post("/getMessages", async (req, res) => {
   res.json("messages");
 });
 
-app.get(
+app.post(
   "/verify",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    console.log("body: " + req.user);
-    res.json({ message: "success", username: req.user.email });
+    console.log("veryfing user: " + req.user);
+    // res.json({ message: "success", username: req.user.email });
+    res.json({ message: "success", user: req.user });
   }
 );
 app.get(

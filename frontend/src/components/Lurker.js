@@ -16,15 +16,17 @@ function Lurker(props) {
   const [notifications, setNotifications] = useState([]);
   const [friendRequests, setFriendRequest] = useState([]);
   const [friendsList, setFriendsList] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [currentlyViewing, setCurrentlyViewing] = useState(null);
   const myEmail = localStorage.getItem("email");
   const userID = localStorage.getItem("userID");
 
   let navigate = useNavigate();
-  console.log("reloaded");
+  console.log("reloaded lurker.js");
 
   useEffect(() => {
     axiosInstance
-      .get("http://localhost:8000/userData")
+      .post("http://localhost:8000/userData")
       .then((response) => {
         console.log(response);
         setFriendRequest((notification) => [
@@ -46,6 +48,8 @@ function Lurker(props) {
           })),
           ...friend,
         ]);
+        console.log(response.data.following);
+        setFollowing(response.data.following);
       })
       .catch((err) => {
         console.log(err);
@@ -64,7 +68,22 @@ function Lurker(props) {
 
       navigate("/lurker/channel/messages/" + data.channelID);
     };
+    const handleSuccessFollowUpdate = (following) => {
+      console.log("success follow: " + userID);
 
+      setFollowing(following);
+    };
+    const handleUpdateCurrentlyViewingFollowers = (followers) => {
+      setCurrentlyViewing((prevState) => ({
+        ...prevState,
+        followers: followers,
+      }));
+    };
+    socket.on("successFollowUpdate", handleSuccessFollowUpdate);
+    socket.on(
+      "updateCurrentlyViewingFollowers",
+      handleUpdateCurrentlyViewingFollowers
+    );
     socket.on("friendRequest", handleFriendReuest);
     socket.on("friendRequestAccepted", handleFriendRequestAccepted);
 
@@ -72,6 +91,10 @@ function Lurker(props) {
       socket.removeAllListeners();
     };
   }, [socket]);
+
+  useEffect(() => {
+    console.log("following: " + JSON.stringify(following));
+  }, [following]);
 
   function denyRequest(id) {
     let filteredArray = friendRequests.filter((item) => item.id !== id);
@@ -105,6 +128,9 @@ function Lurker(props) {
           notifications,
           friendRequests,
           friendsList,
+          following,
+          currentlyViewing,
+          setCurrentlyViewing,
           denyRequest,
           acceptRequest,
         }}

@@ -63,11 +63,42 @@
 .countElement {
   display: flex;
 }
-.innerCountElement {
-  margin-right: 5px;
-  display: flex;
-  border-bottom: solid transparent;
+.outerCountElement {
+  position: relative;
+  /* z-index: 99; */
 }
+.innerCountElement {
+  /* margin-right: 5px;
+  display: flex;
+  border-bottom: solid transparent; */
+  display: flex;
+  margin-right: 5px;
+  border: solid #93c0ff;
+  border-bottom: none;
+  border-radius: 15px 15px 0px 0px;
+  padding: 5px;
+  background: linear-gradient(#646fe6, #9198e5);
+}
+
+.hideInnerCountElement {
+  background: none;
+  border: solid #ffffff00 !important;
+  border-bottom: none;
+  border-radius: 15px 15px 0 0;
+  display: flex;
+  margin-right: 5px;
+  padding: 5px;
+}
+.showInnerCountElement {
+  background: linear-gradient(#646fe6, #9198e5);
+  border: solid #93c0ff;
+  border-bottom: none !important;
+  border-radius: 15px 15px 0 0;
+  display: flex;
+  margin-right: 5px;
+  padding: 5px;
+}
+
 .word {
   color: #93c0ff;
 }
@@ -75,7 +106,8 @@
   margin-right: 5px;
 }
 .innerCountElement:hover {
-  border-bottom: solid;
+  /* border-bottom: solid; */
+  color: white;
 }
 
 #media {

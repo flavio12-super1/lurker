@@ -143,6 +143,26 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+
+    followers: [
+      {
+        userID: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+      },
+    ],
+    following: [
+      {
+        userID: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+      },
+    ],
+
     friendList: [
       {
         userID: {

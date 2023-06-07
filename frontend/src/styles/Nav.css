@@ -112,20 +112,22 @@ a:-webkit-any-link {
 }
 
 #moreOuterDiv {
-  position: absolute;
-  bottom: 5px;
-  left: 90px;
   border: solid white;
   border-radius: 15px;
+  bottom: 5px;
+  left: 90px;
+  position: absolute;
+  z-index: 10;
+  background-color: #494faa;
 }
 #moreInnerDiv {
+  background-color: #484fa9;
+  color: #fff;
+  padding: 5px;
   position: relative;
   width: 150px;
-  background-color: #484fa9;
-  border-radius: 14px;
-  color: white;
-  padding: 5px;
   z-index: 99;
+  border-radius: 15px;
 }
 #moreArrow {
   height: 20px;
@@ -136,7 +138,7 @@ a:-webkit-any-link {
   left: -10px;
   border: solid white;
   transform: rotate(45deg);
-  z-index: 0;
+  z-index: 10;
 }
 
 #moreInnerDiv {

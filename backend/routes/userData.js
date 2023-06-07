@@ -48,11 +48,12 @@ async function getFriends(friends) {
   return friendsWithUsername;
 }
 
-router.get("/", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     const user = await User.findById(req.userId);
     const notifications = user.notifications;
     const friends = user.friendList;
+    const following = user.following;
     console.log("friends channel id: " + friends[0]?.channelID);
 
     const notificationsWithUsername = await getNotificaitons(notifications);
@@ -61,6 +62,7 @@ router.get("/", async (req, res, next) => {
     res.json({
       notifications: notificationsWithUsername,
       friends: friendsWithUsername,
+      following: following,
     });
   } catch (err) {
     next(err);
