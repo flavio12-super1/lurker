@@ -923,6 +923,8 @@ const userPosts = require("./routes/userPosts");
 app.use("/userPosts", verifyJWT, userPosts);
 const count = require("./routes/count");
 app.use("/count", verifyJWT, count);
+const getConversation = require("./routes/getConversation");
+app.use("/getConversation", verifyJWT, getConversation);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

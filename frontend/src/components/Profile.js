@@ -8,7 +8,7 @@ import ColorPicker from "./profileComponents/colorPickerFiles/ColorPicker";
 import ProfileImage from "./profileComponents/profileImageFiles/ProfileImage";
 import UserBiography from "./profileComponents/bioFiles/UserBiography";
 import CountOverlay from "./profileComponents/countOverlayFiles/CountOverlay";
-// import CountOverlayOther from "./profileComponents/countOverlayFiles/CountOverlayOther";
+import Conversation from "./profileComponents/conversationFiles/Conversation";
 import "../styles/Profile.css";
 export const ColorPickerContext = createContext();
 
@@ -32,15 +32,6 @@ function Profile() {
   const editProfile = () => {
     setOverlay(!overlay);
   };
-
-  // const [countFollowersOverlay, setCountFollowersOverlay] = useState(false);
-  // const [countFollowingOverlay, setCountFollowingOverlay] = useState(false);
-  // const toggleFollowersCountOverlay = () => {
-  //   setCountFollowersOverlay(!countFollowersOverlay);
-  // };
-  // const toggleFollowingCountOverlay = () => {
-  //   setCountFollowingOverlay(!countFollowingOverlay);
-  // };
 
   async function checkUserExists(user) {
     try {
@@ -560,9 +551,7 @@ function Profile() {
   const OtherUser = () => {
     return (
       <div className="displayFlex">
-        <div id="sendMessage">
-          <span className="material-icons">send</span>
-        </div>
+        <Conversation currentlyViewing={currentlyViewing} />
         <div id="editProfileBtn">
           {/* <div onClick={() => sendFollowRequest()}>follow</div> */}
           {checkIfFollowing()}
@@ -632,84 +621,17 @@ function Profile() {
               {theme?.userBio}
             </div>
           </div>
-          {/* <div className="profileElement countElement">
-            <div className="outerCountElement">
-              <div className="innerCountElement">
-                <div className="count">{currentlyViewing.followers.length}</div>
-                <div
-                  className="word"
-                  style={{
-                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
-                  }}
-                >
-                  <CountOverlay
-                    text="followers"
-                    currentlyViewing={currentlyViewing}
-                    following={following}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="outerCountElement">
-              <div className="innerCountElement">
-                <div className="count">{currentlyViewing.following.length}</div>
-                <div
-                  className="word"
-                  style={{
-                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
-                  }}
-                >
-                  <CountOverlay
-                    text="following"
-                    currentlyViewing={currentlyViewing}
-                    following={following}
-                  />
-                </div>
-              </div>
-            </div>
-          </div> */}
           <div className="profileElement countElement">
-            {/* <div className="outerCountElement">
-              <div className="innerCountElement">
-                <div className="count">{currentlyViewing.followers.length}</div>
-                <div
-                  className="word"
-                  style={{
-                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
-                  }}
-                >
-                  <CountOverlay
-                    text="followers"
-                    currentlyViewing={currentlyViewing}
-                    following={following}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="outerCountElement">
-              <div className="innerCountElement">
-                <div className="count">{currentlyViewing.following.length}</div>
-                <div
-                  className="word"
-                  style={{
-                    color: `rgba(${theme?.ct.r}, ${theme?.ct.g}, ${theme?.ct.b}, ${theme?.ct.a})`,
-                  }}
-                >
-                  here
-                </div>
-              </div>
-            </div> */}
-
             <CountOverlay
               text="followers"
+              user={user}
               currentlyViewing={currentlyViewing}
               following={following}
               theme={theme}
               count={currentlyViewing.followers.length}
             />
             <CountOverlay
+              user={user}
               text="following"
               currentlyViewing={currentlyViewing}
               following={following}

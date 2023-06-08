@@ -4,13 +4,13 @@ import "./CountOverlay.css";
 
 import { useNavigate } from "react-router-dom";
 
-const UserList = ({ userCount, currentlyViewing, following }) => {
+const UserList = ({ userCount, user, currentlyViewing, following }) => {
   console.log(userCount);
 
   const navigate = useNavigate();
 
-  const handleUsernameClick = (userID) => {
-    navigate(`/profile/${userID}`);
+  const handleUsernameClick = (userEmail) => {
+    navigate(`/lurker/${userEmail}`);
   };
 
   const handleFollowButtonClick = (userID) => {
@@ -18,10 +18,11 @@ const UserList = ({ userCount, currentlyViewing, following }) => {
     console.log(`Follow user ${userID}`);
   };
 
-  const checkIfFollowing = (userID) => {
-    // console.log(friendsList);
-    console.log(following);
-    console.log(userID);
+  const checkIfFollowing = (userID, userEmail) => {
+    if (user === userEmail) {
+      return null;
+    }
+
     const isFollowing = following.some((user) => user.userID === userID);
 
     if (isFollowing) {
@@ -60,12 +61,14 @@ const UserList = ({ userCount, currentlyViewing, following }) => {
               </div>
               <div
                 className="username"
-                onClick={() => handleUsernameClick(user.userID)}
+                onClick={() => handleUsernameClick(user.email)}
               >
                 {user.email}
               </div>
             </div>
-            <div className="height100">{checkIfFollowing(user.userID)}</div>
+            <div className="height100">
+              {checkIfFollowing(user.userID, user.email)}
+            </div>
           </div>
         </div>
       ))}
@@ -73,7 +76,14 @@ const UserList = ({ userCount, currentlyViewing, following }) => {
   );
 };
 
-const CountOverlay = ({ text, currentlyViewing, following, theme, count }) => {
+const CountOverlay = ({
+  text,
+  user,
+  currentlyViewing,
+  following,
+  theme,
+  count,
+}) => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [userCount, setUserCount] = useState(null);
 
@@ -103,7 +113,6 @@ const CountOverlay = ({ text, currentlyViewing, following, theme, count }) => {
           id: currentlyViewing?._id,
         })
         .then(async (response) => {
-          //   console.log(response.data.friends);
           setUserCount(response.data.friends);
         })
         .catch((error) => {
@@ -118,31 +127,6 @@ const CountOverlay = ({ text, currentlyViewing, following, theme, count }) => {
     }
   }, [userCount]);
 
-  //   return (
-  //     <div ref={overlayRef} id="">
-  //       <div
-  //         className=""
-  //         onClick={handleColorPickerClick}
-  //         style={{ cursor: "pointer" }}
-  //       >
-  //         <div>{text}</div>
-  //       </div>
-
-  //       {showOverlay && (
-  //         <div className="countOverlay">
-  //           {userCount ? (
-  //             <UserList
-  //               userCount={userCount}
-  //               currentlyViewing={currentlyViewing}
-  //               following={following}
-  //             />
-  //           ) : (
-  //             <div>Loading</div>
-  //           )}
-  //         </div>
-  //       )}
-  //     </div>
-  //   );
   return (
     <div
       className="outerCountElement"
@@ -150,7 +134,6 @@ const CountOverlay = ({ text, currentlyViewing, following, theme, count }) => {
         zIndex: showOverlay ? "99" : "0",
       }}
     >
-      {/* <div className="innerCountElement"> */}
       <div
         className={
           showOverlay ? "showInnerCountElement" : "hideInnerCountElement"
@@ -195,6 +178,7 @@ const CountOverlay = ({ text, currentlyViewing, following, theme, count }) => {
                 {userCount ? (
                   <UserList
                     userCount={userCount}
+                    user={user}
                     currentlyViewing={currentlyViewing}
                     following={following}
                   />
