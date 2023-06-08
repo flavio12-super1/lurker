@@ -163,17 +163,15 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-    friendList: [
+    channelList: [
       {
-        userID: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
+        members: {
+          type: [{ type: String, required: true }],
         },
-        channelID: {
+        channelID: { type: String, ref: "User", required: true },
+        messageReferanceID: {
           type: String,
-          ref: "User",
-          required: true,
+          require: true,
         },
       },
     ],

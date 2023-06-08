@@ -29,7 +29,7 @@ function Messages() {
   const { socket, myEmail, userID, friendsList } = userData;
   let { channelID } = useParams();
   channelID ??= null;
-  const [room, setRoom] = useState({ room: channelID });
+  const [room, setRoom] = useState({ room: channelID, status: false });
   const [chat, setChat] = useState([]);
   const [searchMessage, setSearchMessage] = useState("");
   const myRef = useRef(null);
@@ -56,11 +56,21 @@ function Messages() {
         url: "/getMessages",
       })
         .then((res) => {
-          console.log(res.data);
+          console.log(res.data.status);
+          setRoom((prevState) => ({ status: true, room: prevState.room }));
           socket.emit("joinRoom", room.room);
           console.log("joined: " + room.room + " successfuly");
         })
         .catch((err) => console.log(err));
+    } else {
+      console.log("user has joined no room");
+    }
+  }, [channelID]);
+
+  //check room state
+  useEffect(() => {
+    if (room.room != null) {
+      console.log(room);
     } else {
       console.log("user has joined no room");
     }
@@ -114,12 +124,19 @@ function Messages() {
     setChat((chat) => [data, ...chat]);
   }
   //recieve messages
+  // useEffect(() => {
+  //   socket.on("message", (data) => {
+  //     console.log(data);
+  //     updateChat(data);
+  //   });
+  // }, []);
+
   useEffect(() => {
     socket.on("message", (data) => {
       console.log(data);
       updateChat(data);
     });
-  }, []);
+  }, [socket]);
 
   const chatContainerRef = useRef(null);
   const [userScrolledToBottom, setUserScrolledToBottom] = useState(1);
@@ -177,9 +194,9 @@ function Messages() {
   const handleKeyPress = (event) => {
     const chatContainer = chatContainerRef.current;
     const { scrollHeight, clientHeight } = chatContainer;
-    console.log(scrollHeight);
-    console.log(clientHeight);
-    console.log("key enter pressed");
+    // console.log(scrollHeight);
+    // console.log(clientHeight);
+    // console.log("key enter pressed");
   };
 
   useEffect(() => {
@@ -204,6 +221,7 @@ function Messages() {
           images: [res.data],
           message: messages,
           channelID: channelID,
+          status: room.status,
         };
         socket.emit("message", data);
       });
@@ -212,6 +230,7 @@ function Messages() {
       const data = {
         message: messages,
         channelID: channelID,
+        status: room.status,
       };
       socket.emit("message", data);
     }

@@ -163,10 +163,39 @@ const verify = (req, res, next) => {
   }
 };
 
+// const checkRoomAccess = async (req, res, next) => {
+//   const { channelID } = req.params;
+//   console.log("roomID: " + channelID);
+//   const channel = await Channel.findOne({ channelID: channelID });
+//   if (channel) {
+//     console.log("channel exists");
+//     console.log(req.userId);
+//     console.log(channel.members);
+//     if (channel.members.includes(req.userId)) {
+//       console.log("user is authorized to access this room");
+//       next();
+//     } else {
+//       // res.json({ message: "user is not authorized to access this room" });
+//       res.redirect("/lurker");
+//     }
+//   } else {
+//     // res.json({ message: "channel does not exist" });
+//     res.redirect("/lurker");
+//   }
+//   console.log("channel: " + channel);
+// };
 const checkRoomAccess = async (req, res, next) => {
   const { channelID } = req.params;
   console.log("roomID: " + channelID);
-  const channel = await Channel.findOne({ channelID: channelID });
+  // const channel = await Channel.findOne({ channelID: channelID });
+  const user = await User.findOne({ _id: req.userId });
+  if (!user) {
+    return res.status(404).send("User not found");
+  }
+  const channel = user.channelList.find(
+    (channel) =>
+      channel.channelID === channelID && channel.members.includes(req.userId)
+  );
   if (channel) {
     console.log("channel exists");
     console.log(req.userId);
@@ -288,6 +317,7 @@ app.post("/signup", loginLimiter, async (req, res) => {
           email,
           password: hashedPassword,
           theme: defaultTheme,
+          channelList: [],
         });
         await user.save();
         res.status(201).json({ message: "User created" });
@@ -483,14 +513,33 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", async (data) => {
+    const user = await User.findById(socket.userId);
+
+    if (!user) {
+      console.log("user dosen't exist");
+      return res.status(401).json({ error: "user dosen't exist" });
+    }
+
+    console.log(user.email);
+
     console.log(session.user.userName);
     console.log(data.message);
+    console.log(data.status);
+
+    if (data.status == true) {
+      console.log("status is true");
+    } else {
+      console.log("status is false");
+    }
+
     const dataObject = {
       username: session.user.userName,
       images: data.images,
       message: data.message,
     };
+
     console.log(dataObject);
+    console.log("dataObject being sent to room: " + data.channelID);
     io.sockets.in(data.channelID).emit("message", dataObject);
   });
 
@@ -858,7 +907,9 @@ io.on("connection", (socket) => {
 
   socket.on("leaveRoom", (currentRoom, callback) => {
     // Perform necessary operations to leave the current room
+    console.log("leaving => " + currentRoom);
     socket.leave(currentRoom);
+    // socket.leaveAll();
     // Acknowledge the event and call the callback function
     callback();
   });
@@ -925,6 +976,8 @@ const count = require("./routes/count");
 app.use("/count", verifyJWT, count);
 const getConversation = require("./routes/getConversation");
 app.use("/getConversation", verifyJWT, getConversation);
+const getMessages = require("./routes/getMessages");
+app.use("/getMessages", verifyJWT, getMessages);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -932,11 +985,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong!" });
 });
 
-app.post("/getMessages", async (req, res) => {
-  const { roomID } = req.body;
-  console.log(roomID);
-  res.json("messages");
-});
+// app.post("/getMessages", async (req, res) => {
+//   const { roomID } = req.body;
+//   console.log(roomID);
+//   res.json("messages");
+// });
 
 app.post(
   "/verify",

@@ -1,8 +1,11 @@
 import React from "react";
 import "./Conversation.css";
 import axiosInstance from "../../../config/axiosConfig";
+import { useNavigate } from "react-router-dom";
 
 function Conversation({ currentlyViewing }) {
+  let navigate = useNavigate();
+
   const startConversation = (userID) => {
     console.log("start conversation: " + userID);
     axiosInstance
@@ -11,6 +14,7 @@ function Conversation({ currentlyViewing }) {
       })
       .then(async (response) => {
         console.log(response.data.channelID);
+        navigate(`/lurker/channel/messages/${response.data.channelID}`);
       })
       .catch((error) => {
         console.log(error);

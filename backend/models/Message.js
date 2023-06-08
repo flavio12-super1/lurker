@@ -1,14 +1,6 @@
 const mongoose = require("mongoose");
 
 const Data = mongoose.Schema({
-  senderName: {
-    type: String,
-    required: true,
-  },
-  recipientName: {
-    type: String,
-    required: true,
-  },
   message: {
     type: Object,
     required: false,

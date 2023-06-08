@@ -1,6 +1,6 @@
 import axios from "axios";
 import "../styles/Lurker.css";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import React, { useContext, useState, useEffect } from "react";
 import { createContext } from "react";
 import SocketContext from "../config/SocketContext";
@@ -9,6 +9,8 @@ import Nav from "./Nav";
 export const UserContext = createContext();
 
 function Lurker(props) {
+  let { channelID } = useParams();
+  channelID ??= null;
   const userData = useContext(SocketContext);
 
   const { socket } = userData;
@@ -23,37 +25,7 @@ function Lurker(props) {
 
   let navigate = useNavigate();
   console.log("reloaded lurker.js");
-
   useEffect(() => {
-    axiosInstance
-      .post("http://localhost:8000/userData")
-      .then((response) => {
-        console.log(response);
-        setFriendRequest((notification) => [
-          ...response.data.notifications.map((user) => ({
-            email: user.email,
-            id: user.id,
-            userID: user.userID,
-            imageURL: user.imageURL,
-          })),
-          ...notification,
-        ]);
-        setFriendsList((friend) => [
-          ...response.data.friends.map((user) => ({
-            email: user.email,
-            id: user.id,
-            userID: user.userID,
-            imageURL: user.imageURL,
-            channelID: user.channelID,
-          })),
-          ...friend,
-        ]);
-        console.log(response.data.following);
-        setFollowing(response.data.following);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
     const handleFriendReuest = (data) => {
       alert("Friend request from" + data.email);
       console.log(data);
@@ -91,6 +63,37 @@ function Lurker(props) {
       socket.removeAllListeners();
     };
   }, [socket]);
+
+  useEffect(() => {
+    axiosInstance
+      .post("http://localhost:8000/userData")
+      .then((response) => {
+        console.log(response);
+        setFriendRequest((notification) => [
+          ...response.data.notifications.map((user) => ({
+            email: user.email,
+            id: user.id,
+            userID: user.userID,
+            imageURL: user.imageURL,
+          })),
+          ...notification,
+        ]);
+        setFriendsList(
+          response.data.channels.map((user) => ({
+            email: user.email,
+            id: user.id,
+            userID: user.userID,
+            imageURL: user.imageURL,
+            channelID: user.channelID,
+          }))
+        );
+        console.log(response.data.following);
+        setFollowing(response.data.following);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [channelID]);
 
   useEffect(() => {
     console.log("following: " + JSON.stringify(following));
