@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const { User } = require("../models/userSchema");
 
+const Message = require("../models/message");
+
 // router.post("/", async (req, res, next) => {
 //   const { id } = req.body; // Assuming the selected theme is sent from the frontend
 //   console.log("currently viewing id: " + id);
@@ -58,10 +60,18 @@ router.post("/", async (req, res, next) => {
     } else {
       console.log("not found");
       // Channel not found, create a new channel
+
+      const messageId = crypto.randomBytes(16).toString("hex");
+      const message = new Message({
+        messageID: messageId,
+        message: [],
+      });
+      const savedMessage = await message.save();
+
       const newChannel = {
         members: [id, userId],
         channelID: generateUniqueChannelID(), // Use your method or library to generate a unique channelID
-        messageReferanceID: null,
+        messageReferanceID: savedMessage.messageID,
         state: true,
       };
 

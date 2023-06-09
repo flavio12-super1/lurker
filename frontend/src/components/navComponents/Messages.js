@@ -29,14 +29,18 @@ function Messages() {
   const { socket, myEmail, userID, friendsList } = userData;
   let { channelID } = useParams();
   channelID ??= null;
-  const [room, setRoom] = useState({ room: channelID, status: false });
+  const [room, setRoom] = useState({
+    room: channelID,
+    status: false,
+    messageID: null,
+  });
   const [chat, setChat] = useState([]);
   const [searchMessage, setSearchMessage] = useState("");
   const myRef = useRef(null);
 
-  useEffect(() => {
-    setRoom({ room: channelID });
-  }, [channelID]);
+  // useEffect(() => {
+  //   setRoom({ room: channelID });
+  // }, [channelID]);
 
   useEffect(() => {
     console.log("friendsList: " + JSON.stringify(friendsList));
@@ -45,26 +49,66 @@ function Messages() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   //update room
+  // useEffect(() => {
+  //   if (room.room != null) {
+  //     axiosInstance({
+  //       method: "POST",
+  //       data: {
+  //         roomID: room.room,
+  //       },
+  //       withCredentials: true,
+  //       url: "/getMessages",
+  //     })
+  //       .then((res) => {
+  //         console.log("room" + channelID);
+  //         console.log("status" + res.data.status);
+  //         console.log("messageID" + res.data.messageID);
+  //         setRoom({
+  //           status: res.data.status,
+  //           messageID: res.data.messageID,
+  //           room: channelID,
+  //         });
+  //         socket.emit("joinRoom", room.room);
+  //         console.log("joined: " + room.room + " successfuly");
+  //       })
+  //       .catch((err) => console.log(err));
+  //   } else {
+  //     console.log("user has joined no room");
+  //   }
+  // }, [channelID]);
   useEffect(() => {
-    if (room.room != null) {
+    if (channelID != null) {
       axiosInstance({
         method: "POST",
         data: {
-          roomID: room.room,
+          roomID: channelID,
         },
         withCredentials: true,
         url: "/getMessages",
       })
         .then((res) => {
-          console.log(res.data.status);
-          setRoom((prevState) => ({ status: true, room: prevState.room }));
-          socket.emit("joinRoom", room.room);
-          console.log("joined: " + room.room + " successfuly");
+          console.log("room" + channelID);
+          console.log("status" + res.data.status);
+          console.log("messageID" + res.data.messageID);
+          setRoom({
+            status: res.data.status,
+            messageID: res.data.messageID,
+            room: channelID,
+          });
+          socket.emit("joinRoom", channelID);
+          console.log("joined: " + channelID + " successfuly");
         })
         .catch((err) => console.log(err));
     } else {
       console.log("user has joined no room");
     }
+    return () => {
+      console.log(channelID);
+      socket.emit("leaveRoom", channelID, () => {
+        console.log("user has left room => : " + channelID);
+        setChat([]);
+      });
+    };
   }, [channelID]);
 
   //check room state
@@ -131,12 +175,24 @@ function Messages() {
   //   });
   // }, []);
 
+  // useEffect(() => {
+  //   socket.on("message", (data) => {
+  //     console.log(data);
+  //     updateChat(data);
+  //   });
+  // }, [channelID]);
   useEffect(() => {
-    socket.on("message", (data) => {
+    const handleMessage = (data) => {
       console.log(data);
       updateChat(data);
-    });
-  }, [socket]);
+    };
+
+    socket.on("message", handleMessage);
+
+    return () => {
+      socket.off("message", handleMessage);
+    };
+  }, [channelID]);
 
   const chatContainerRef = useRef(null);
   const [userScrolledToBottom, setUserScrolledToBottom] = useState(1);
@@ -222,7 +278,12 @@ function Messages() {
           message: messages,
           channelID: channelID,
           status: room.status,
+          messageID: room.messageID,
         };
+        setRoom((prevState) => ({
+          ...prevState,
+          status: false,
+        }));
         socket.emit("message", data);
       });
     } else {
@@ -231,7 +292,13 @@ function Messages() {
         message: messages,
         channelID: channelID,
         status: room.status,
+        messageID: room.messageID,
       };
+      //here
+      setRoom((prevState) => ({
+        ...prevState,
+        status: false,
+      }));
       socket.emit("message", data);
     }
   };

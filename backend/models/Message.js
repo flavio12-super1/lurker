@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const Data = mongoose.Schema({
+  userID: {
+    type: { type: String, required: true },
+  },
   message: {
     type: Object,
     required: false,
@@ -14,7 +17,7 @@ const Data = mongoose.Schema({
   },
 });
 
-const MessageScheme = mongoose.Schema({
+const MessageSchema = mongoose.Schema({
   messageID: {
     type: String,
   },
@@ -23,4 +26,8 @@ const MessageScheme = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("message", MessageScheme, "messages");
+// module.exports = mongoose.model("message", MessageScheme, "messages");
+
+const Message = mongoose.model("Message", MessageSchema, "messages");
+
+module.exports = Message;

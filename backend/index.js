@@ -112,6 +112,7 @@ mdb.on("error", (error) => console.error(error));
 mdb.once("open", () => console.log("Connected to Mongoose"));
 
 const { User } = require("./models/userSchema");
+const Message = require("./models/message");
 
 //validate email:
 const validateEmail = (email) => {
@@ -450,7 +451,7 @@ app.post("/api/posts", upload.single("image"), async (req, res) => {
 const io = require("socket.io")(server);
 const Room = require("./models/Room");
 const Channel = require("./models/Channel");
-const Message = require("./models/Message");
+// const Message = require("./models/message");
 const crypto = require("crypto");
 
 // convert a connect middleware to a Socket.IO middleware
@@ -523,13 +524,53 @@ io.on("connection", (socket) => {
     console.log(user.email);
 
     console.log(session.user.userName);
-    console.log(data.message);
-    console.log(data.status);
+    console.log("message: " + data.message);
+    console.log("status: " + data.status);
+    console.log("messageID: " + data.messageID);
 
     if (data.status == true) {
-      console.log("status is true");
+      console.log("channel is currently empty");
+
+      const newMessage = {
+        userID: socket.userId,
+        images: data.images,
+        message: data.message,
+        messageReferance: null,
+      };
+
+      Message.findOneAndUpdate(
+        { messageID: data.messageID },
+        { $push: { message: newMessage } },
+        { new: true } // Return the updated document
+      )
+        .then((response) => {
+          console.log("new message");
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     } else {
-      console.log("status is false");
+      console.log("send message normally");
+
+      const newMessage = {
+        userID: socket.userId,
+        images: data.images,
+        message: data.message,
+        messageReferance: null,
+      };
+
+      Message.findOneAndUpdate(
+        { messageID: data.messageID },
+        { $push: { message: newMessage } },
+        { new: true } // Return the updated document
+      )
+        .then((response) => {
+          // console.log(response);
+          console.log("new message");
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
 
     const dataObject = {
@@ -907,8 +948,12 @@ io.on("connection", (socket) => {
 
   socket.on("leaveRoom", (currentRoom, callback) => {
     // Perform necessary operations to leave the current room
-    console.log("leaving => " + currentRoom);
-    socket.leave(currentRoom);
+    if (currentRoom != null) {
+      console.log("leaving => " + currentRoom);
+
+      socket.leave(currentRoom);
+    }
+
     // socket.leaveAll();
     // Acknowledge the event and call the callback function
     callback();
