@@ -538,6 +538,67 @@ io.on("connection", (socket) => {
         messageReferance: null,
       };
 
+      // Find the channel in the user's channelList
+      // const channel = await User.findOne({
+      //   "channelList.channelID": data.channelID,
+      // });
+
+      // if (channel) {
+      //   const otherUser = channel.members.find(
+      //     (member) => member !== socket.userId
+      //   );
+
+      //   if (otherUser) {
+      //     // Update the other user's channelList with the new channel
+      //     await User.updateOne(
+      //       { _id: otherUser },
+      //       {
+      //         $push: {
+      //           channelList: { ...channel },
+      //         },
+      //       }
+      //     );
+      //   }
+      // }
+
+      const user = await User.findOne({ _id: socket.userId });
+      if (!user) {
+        return res.status(404).send("User not found");
+      }
+
+      // Search for a channel that includes both current user and target user
+      const channel = user.channelList.find(
+        (channel) => channel.channelID === data.channelID
+      );
+
+      console.log("channel found: " + channel);
+
+      const otherUserId = channel.members.find(
+        (member) => member !== socket.userId
+      );
+
+      if (otherUserId) {
+        const otherUser = await User.findOne({ _id: otherUserId });
+
+        if (otherUser) {
+          const otherChannel = {
+            members: channel.members,
+            channelID: channel.channelID,
+            messageReferanceID: channel.messageReferanceID,
+          };
+
+          otherUser.channelList.push(otherChannel);
+          await otherUser.save();
+          const newChannel = {
+            email: user.email,
+            userID: user._id,
+            imageURL: user.theme.imageURL,
+            channelID: data.channelID,
+          };
+          io.to(otherUserId).emit("newChannel", newChannel);
+        }
+      }
+
       Message.findOneAndUpdate(
         { messageID: data.messageID },
         { $push: { message: newMessage } },
@@ -545,6 +606,7 @@ io.on("connection", (socket) => {
       )
         .then((response) => {
           console.log("new message");
+          console.log(response);
         })
         .catch((err) => {
           console.error(err);

@@ -51,7 +51,7 @@ function Nav() {
               <div className="divImg">
                 <img
                   className="navIcons"
-                  src="https://upload-image-demo-fh.s3.us-west-1.amazonaws.com/28ed1b7ba72c2599ee60bc7edaac7b3ae6344805346d68750311c3c5e3e4007b?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA53XOIF5EVVI62AN3%2F20230602%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20230602T204937Z&X-Amz-Expires=604800&X-Amz-Signature=993842a414c42c78980d0e3ad5439cbe0cf1ed05e22c3dc9a5e9807080efd735&X-Amz-SignedHeaders=host&x-id=GetObject"
+                  src="https://upload-image-demo-fh.s3.us-west-1.amazonaws.com/28ed1b7ba72c2599ee60bc7edaac7b3ae6344805346d68750311c3c5e3e4007b?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA53XOIF5EVVI62AN3%2F20230610%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20230610T044252Z&X-Amz-Expires=604800&X-Amz-Signature=c81b15067ec2315ac8ad75131c2778d196ce491b29828aac665aae5a1da6f761&X-Amz-SignedHeaders=host&x-id=GetObject"
                   alt="spider"
                 />
               </div>

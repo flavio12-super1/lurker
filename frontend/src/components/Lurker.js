@@ -51,6 +51,9 @@ function Lurker(props) {
         followers: followers,
       }));
     };
+    const handleNewChannel = (newChannel) => {
+      setFriendsList((prevState) => [newChannel, ...prevState]);
+    };
     socket.on("successFollowUpdate", handleSuccessFollowUpdate);
     socket.on(
       "updateCurrentlyViewingFollowers",
@@ -58,6 +61,7 @@ function Lurker(props) {
     );
     socket.on("friendRequest", handleFriendReuest);
     socket.on("friendRequestAccepted", handleFriendRequestAccepted);
+    socket.on("newChannel", handleNewChannel);
 
     return () => {
       socket.removeAllListeners();
