@@ -96,6 +96,8 @@ function Messages() {
             room: channelID,
           });
           socket.emit("joinRoom", channelID);
+          setChat(res.data.messages);
+          console.log(res.data.messages);
           console.log("joined: " + channelID + " successfuly");
         })
         .catch((err) => console.log(err));
@@ -165,7 +167,7 @@ function Messages() {
   };
 
   function updateChat(data) {
-    setChat((chat) => [data, ...chat]);
+    setChat((chat) => [...chat, data]);
   }
   //recieve messages
   // useEffect(() => {
@@ -618,7 +620,7 @@ function Messages() {
               <div id="chatMessagesDiv" ref={chatContainerRef}>
                 <div style={{ overflowAnchor: "none" }}>
                   <div>
-                    {renderChat().reverse()}
+                    {renderChat()}
                     <div ref={myRef}></div>
                   </div>
                 </div>

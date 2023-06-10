@@ -32,10 +32,15 @@ router.post("/", async (req, res, next) => {
         return res.json({
           status: true,
           messageID: channel.messageReferanceID,
+          messages: message.message,
         });
       }
       // Channel found, return its channelID
-      return res.json({ status: false, messageID: channel.messageReferanceID });
+      return res.json({
+        status: false,
+        messageID: channel.messageReferanceID,
+        messages: message.message,
+      });
     } else {
       console.log("not found");
 
